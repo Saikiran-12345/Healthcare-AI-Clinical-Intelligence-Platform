@@ -46,9 +46,12 @@
 
 <!-- Filter Tabs -->
 <div class="tab-navigation">
-    <a href="/notifications/?filter=all" class="tab-item {% if filter_type == 'all' %}active{% endif %}">All Notifications</a>
-    <a href="/notifications/?filter=unread" class="tab-item {% if filter_type == 'unread' %}active{% endif %}">Unread ({{ stats.unread }})</a>
-    <a href="/notifications/?filter=read" class="tab-item {% if filter_type == 'read' %}active{% endif %}">Read</a>
+    <a href="/notifications/?filter=all" class="tab-item {% if filter_type == 'all' and not notification_type %}active{% endif %}">All Notifications</a>
+    <a href="/notifications/?filter=unread" class="tab-item {% if filter_type == 'unread' and not notification_type %}active{% endif %}">Unread ({{ stats.unread }})</a>
+    <a href="/notifications/?filter=read" class="tab-item {% if filter_type == 'read' and not notification_type %}active{% endif %}">Read</a>
+    {% for type_name, count in stats.by_type.items %}
+        <a href="/notifications/?filter={{ filter_type }}&type={{ type_name }}" class="tab-item {% if notification_type == type_name %}active{% endif %}">{{ type_name|title|cut:"_" }} ({{ count }})</a>
+    {% endfor %}
 </div>
 
 <!-- Notification List -->

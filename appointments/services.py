@@ -9,6 +9,7 @@ from core.audit import AuditAction, AuditLogger
 from core.exceptions import AppointmentConflictError, RecordNotFoundError, ValidationError
 from core.storage import db, utc_now_iso
 from core.validators import Validator
+from notifications.services import NotificationPriority, NotificationService, NotificationType
 
 
 AVAILABLE_TIME_SLOTS = [
@@ -107,15 +108,15 @@ class AppointmentService:
         saved_appointment = db.appointments.insert(appointment_record)
 
         # Create doctor notification
-        db.notifications.insert({
-            "user_id": doctor.get("user_id", ""),
-            "title": "New Appointment Request",
-            "message": f"Patient {patient.get('full_name')} requested an appointment for {clean_date} at {clean_time}.",
-            "category": "Appointment",
-            "priority": "HIGH" if priority == "Urgent" else "NORMAL",
-            "read": False,
-            "created_at": utc_now_iso(),
-        })
+        NotificationService.create(
+            recipient_id=doctor.get("user_id", ""),
+            notification_type=NotificationType.APPOINTMENT_REQUESTED,
+            title="New Appointment Request",
+            message=f"Patient {patient.get('full_name')} requested an appointment for {clean_date} at {clean_time}.",
+            priority=NotificationPriority.HIGH if priority == "Urgent" else NotificationPriority.NORMAL,
+            link="/appointments/",
+            metadata={"appointment_id": saved_appointment["id"]},
+        )
 
         AuditLogger.log(
             action=AuditAction.APPOINTMENT_REQUESTED,
@@ -150,15 +151,15 @@ class AppointmentService:
 
         # Notify patient
         patient = db.patients.get_by_id(appointment["patient_id"])
-        db.notifications.insert({
-            "user_id": patient.get("user_id", ""),
-            "title": "Appointment Confirmed",
-            "message": f"Your appointment with {appointment['doctor_name']} on {appointment['appointment_date']} at {appointment['appointment_time']} has been approved.",
-            "category": "Appointment",
-            "priority": "HIGH",
-            "read": False,
-            "created_at": utc_now_iso(),
-        })
+        NotificationService.create(
+            recipient_id=patient.get("user_id", ""),
+            notification_type=NotificationType.APPOINTMENT_APPROVED,
+            title="Appointment Confirmed",
+            message=f"Your appointment with {appointment['doctor_name']} on {appointment['appointment_date']} at {appointment['appointment_time']} has been approved.",
+            priority=NotificationPriority.HIGH,
+            link="/appointments/",
+            metadata={"appointment_id": appointment_id},
+        )
 
         AuditLogger.log(
             action=AuditAction.APPOINTMENT_APPROVED,
@@ -190,15 +191,15 @@ class AppointmentService:
         updated = db.appointments.update(appointment_id, updates)
 
         patient = db.patients.get_by_id(appointment["patient_id"])
-        db.notifications.insert({
-            "user_id": patient.get("user_id", ""),
-            "title": "Appointment Declined",
-            "message": f"Your appointment request for {appointment['appointment_date']} was declined: {updates['doctor_notes']}",
-            "category": "Appointment",
-            "priority": "HIGH",
-            "read": False,
-            "created_at": utc_now_iso(),
-        })
+        NotificationService.create(
+            recipient_id=patient.get("user_id", ""),
+            notification_type=NotificationType.APPOINTMENT_REJECTED,
+            title="Appointment Declined",
+            message=f"Your appointment request for {appointment['appointment_date']} was declined: {updates['doctor_notes']}",
+            priority=NotificationPriority.HIGH,
+            link="/appointments/",
+            metadata={"appointment_id": appointment_id},
+        )
 
         AuditLogger.log(
             action=AuditAction.APPOINTMENT_REJECTED,
@@ -222,8 +223,41 @@ class AppointmentService:
         """Cancel an appointment by either patient or doctor."""
         appointment = db.appointments.get_by_id(appointment_id)
 
+        if appointment.get("status") not in ["Pending", "Approved"]:
+            raise ValidationError("Only pending or approved appointments can be cancelled.")
+
+        if role == "patient" and appointment.get("patient_id") != user_id:
+            raise ValidationError("You are not authorized to cancel this appointment.")
+        if role == "doctor" and appointment.get("doctor_id") != user_id:
+            raise ValidationError("You are not authorized to cancel this appointment.")
+        if role not in ["patient", "doctor"]:
+            raise ValidationError("Only patients and doctors can cancel appointments.")
+
         updates = {"status": "Cancelled"}
         updated = db.appointments.update(appointment_id, updates)
+
+        recipient_id = (
+            appointment.get("doctor_user_id")
+            if role == "patient"
+            else appointment.get("patient_user_id")
+        )
+        if not recipient_id:
+            recipient_record = (
+                db.doctors.get_by_id(appointment["doctor_id"])
+                if role == "patient"
+                else db.patients.get_by_id(appointment["patient_id"])
+            )
+            recipient_id = recipient_record.get("user_id", "")
+
+        NotificationService.create(
+            recipient_id=recipient_id,
+            notification_type=NotificationType.APPOINTMENT_CANCELLED,
+            title="Appointment Cancelled",
+            message=f"The appointment on {appointment['appointment_date']} at {appointment['appointment_time']} was cancelled.",
+            priority=NotificationPriority.HIGH,
+            link="/appointments/",
+            metadata={"appointment_id": appointment_id},
+        )
 
         AuditLogger.log(
             action=AuditAction.APPOINTMENT_CANCELLED,

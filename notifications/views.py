@@ -20,19 +20,20 @@ def notification_center_view(request):
     """
     user_id = request.user.id
     filter_type = request.GET.get("filter", "all")  # all, unread, read
+    notification_type = request.GET.get("type", "")
 
     if filter_type == "unread":
         notifications = NotificationService.get_user_notifications(
-            user_id=user_id, include_read=False, limit=100,
+            user_id=user_id, include_read=False, notification_type=notification_type or None, limit=100,
         )
     elif filter_type == "read":
         all_notifs = NotificationService.get_user_notifications(
-            user_id=user_id, include_read=True, limit=100,
+            user_id=user_id, include_read=True, notification_type=notification_type or None, limit=100,
         )
         notifications = [n for n in all_notifs if n.get("is_read")]
     else:
         notifications = NotificationService.get_user_notifications(
-            user_id=user_id, include_read=True, limit=100,
+            user_id=user_id, include_read=True, notification_type=notification_type or None, limit=100,
         )
 
     stats = NotificationService.get_notification_stats(user_id)
@@ -41,6 +42,7 @@ def notification_center_view(request):
         "notifications": notifications,
         "stats": stats,
         "filter_type": filter_type,
+        "notification_type": notification_type,
     }
     return render(request, "notifications/center.html", context)
 

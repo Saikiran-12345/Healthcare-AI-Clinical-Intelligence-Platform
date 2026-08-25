@@ -67,6 +67,12 @@ class PatientRegistrationForm(forms.Form):
         password = cleaned_data.get("password")
         confirm_password = cleaned_data.get("confirm_password")
 
+        if password:
+            try:
+                Validator.validate_password(password)
+            except ValidationError as exc:
+                self.add_error("password", str(exc))
+
         if password and confirm_password and password != confirm_password:
             self.add_error("confirm_password", "Passwords do not match.")
 
@@ -131,6 +137,12 @@ class PasswordChangeForm(forms.Form):
         cleaned_data = super().clean()
         new_password = cleaned_data.get("new_password")
         confirm = cleaned_data.get("confirm_new_password")
+        if new_password:
+            try:
+                Validator.validate_password(new_password)
+            except ValidationError as exc:
+                self.add_error("new_password", str(exc))
+
         if new_password and confirm and new_password != confirm:
             self.add_error("confirm_new_password", "New passwords do not match.")
         return cleaned_data

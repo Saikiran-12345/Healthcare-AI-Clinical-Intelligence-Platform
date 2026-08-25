@@ -4,6 +4,7 @@ Coordinates patient profiles, longitudinal health metrics, structured medical hi
 and symptom records across local JSON tables.
 """
 
+from datetime import date
 from typing import Any, Dict, List, Optional
 from core.audit import AuditAction, AuditLogger
 from core.exceptions import RecordNotFoundError, ValidationError
@@ -282,7 +283,11 @@ class PatientService:
 
         # Fetch upcoming appointments
         appointments = db.appointments.find_all(
-            filters={"patient_id": patient_id},
+            filter_func=lambda appointment: (
+                appointment.get("patient_id") == patient_id
+                and appointment.get("status") in ["Pending", "Approved"]
+                and appointment.get("appointment_date", "") >= date.today().isoformat()
+            ),
             sort_by="appointment_date",
             reverse=False,
             limit=5

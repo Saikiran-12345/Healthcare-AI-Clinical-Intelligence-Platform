@@ -18,6 +18,7 @@ from patients.services import PatientService
 from doctors.services import DoctorService
 from appointments.services import AppointmentService
 from core.exceptions import AppointmentConflictError
+from notifications.services import NotificationService, NotificationType
 
 
 class TestAppointmentService(unittest.TestCase):
@@ -28,11 +29,12 @@ class TestAppointmentService(unittest.TestCase):
         from core import storage
         self.orig_db = storage.db
         storage.db = JsonDatabase(self.temp_dir)
-        import accounts.services, patients.services, doctors.services, appointments.services
+        import accounts.services, patients.services, doctors.services, appointments.services, notifications.services
         accounts.services.db = storage.db
         patients.services.db = storage.db
         doctors.services.db = storage.db
         appointments.services.db = storage.db
+        notifications.services.db = storage.db
 
         # Register doctor
         self.doc_user = AuthService.register_user(
@@ -73,11 +75,12 @@ class TestAppointmentService(unittest.TestCase):
     def tearDown(self):
         from core import storage
         storage.db = self.orig_db
-        import accounts.services, patients.services, doctors.services, appointments.services
+        import accounts.services, patients.services, doctors.services, appointments.services, notifications.services
         accounts.services.db = self.orig_db
         patients.services.db = self.orig_db
         doctors.services.db = self.orig_db
         appointments.services.db = self.orig_db
+        notifications.services.db = self.orig_db
         shutil.rmtree(self.temp_dir, ignore_errors=True)
 
     def test_booking_and_conflict_detection(self):
@@ -147,6 +150,27 @@ class TestAppointmentService(unittest.TestCase):
         slots = AppointmentService.get_doctor_available_slots(self.doctor["id"], self.future_date)
         self.assertNotIn("09:00", slots)
         self.assertIn("09:30", slots)
+
+    def test_notification_type_filter(self):
+        NotificationService.create(
+            recipient_id=self.pat_user1["id"],
+            notification_type=NotificationType.APPOINTMENT_APPROVED,
+            title="Appointment Confirmed",
+            message="Your appointment was approved.",
+        )
+        NotificationService.create(
+            recipient_id=self.pat_user1["id"],
+            notification_type=NotificationType.HIGH_RISK_ALERT,
+            title="Risk Alert",
+            message="Review your latest assessment.",
+        )
+
+        alerts = NotificationService.get_user_notifications(
+            self.pat_user1["id"], notification_type=NotificationType.HIGH_RISK_ALERT
+        )
+
+        self.assertEqual(len(alerts), 1)
+        self.assertEqual(alerts[0]["type"], NotificationType.HIGH_RISK_ALERT)
 
 
 if __name__ == '__main__':

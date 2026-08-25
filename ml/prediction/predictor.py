@@ -115,7 +115,7 @@ class UnifiedPredictionEngine:
         prob_pct = round(float(proba * 100), 1)
 
         # Classify risk level
-        if prob_pct < 35.0:
+        if prob_pct < 60.0:
             risk_level = "LOW"
             badge_color = "green"
             clinical_summary = "Low baseline statistical likelihood of disease based on current biomarkers."

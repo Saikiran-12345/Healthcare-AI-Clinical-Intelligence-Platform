@@ -190,6 +190,7 @@ class NotificationService:
         user_id: str,
         include_read: bool = True,
         include_archived: bool = False,
+        notification_type: Optional[str] = None,
         limit: int = 50,
     ) -> List[Dict[str, Any]]:
         """
@@ -201,6 +202,8 @@ class NotificationService:
             if not include_read and rec.get("is_read"):
                 return False
             if not include_archived and rec.get("is_archived"):
+                return False
+            if notification_type and rec.get("type") != notification_type:
                 return False
             return True
 
