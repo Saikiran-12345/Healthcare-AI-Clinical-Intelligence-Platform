@@ -5,11 +5,13 @@ NLP symptom analysis, recommendations, notifications, analytics, and administrat
 """
 
 from django.urls import path, include
+from core.api import patient_summary_api
 from core.views import home_view
 
 urlpatterns = [
     # Core Landing
     path('', home_view, name='home'),
+    path('api/patient/summary/', patient_summary_api, name='patient_summary_api'),
 
     # Modular App Routers
     path('accounts/', include('accounts.urls')),
