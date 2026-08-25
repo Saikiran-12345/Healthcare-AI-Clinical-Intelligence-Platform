@@ -1,0 +1,15 @@
+{% extends 'base.html' %}
+
+{% block title %}404 - Page Not Found | HealthAI{% endblock %}
+{% block page_title %}404 - Resource Not Found{% endblock %}
+
+{% block content %}
+<div style="text-align: center; padding: 4rem 1rem;">
+    <div style="font-size: 4rem; margin-bottom: 1rem;">🔍</div>
+    <h1 style="font-size: 2rem; font-weight: 800; margin-bottom: 0.5rem;">Page Not Found</h1>
+    <p style="color: var(--text-muted); max-width: 500px; margin: 0 auto 2rem;">
+        The clinical record, assessment, or page you requested could not be located in the local system.
+    </p>
+    <a href="/" class="btn btn-primary">Return to Homepage</a>
+</div>
+{% endblock %}

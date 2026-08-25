@@ -1,0 +1,235 @@
+{
+  "disease_type": "diabetes",
+  "disease_key": "diabetes",
+  "best_algorithm": "Logistic Regression",
+  "features_used": [
+    "age",
+    "bmi",
+    "glucose",
+    "systolic_bp",
+    "diastolic_bp",
+    "exercise_frequency",
+    "family_history",
+    "smoking",
+    "cholesterol"
+  ],
+  "feature_importance": {
+    "age": 0.6695,
+    "bmi": 0.5488,
+    "glucose": 1.1309,
+    "systolic_bp": 0.0607,
+    "diastolic_bp": 0.238,
+    "exercise_frequency": 0.3141,
+    "family_history": 0.4028,
+    "smoking": 0.2159,
+    "cholesterol": 0.2247
+  },
+  "metrics": {
+    "accuracy": 0.7542,
+    "accuracy_pct": 75.42,
+    "precision": 0.7063,
+    "recall": 0.8018,
+    "f1_score": 0.7511,
+    "roc_auc": 0.847,
+    "confusion_matrix": [
+      [
+        92,
+        37
+      ],
+      [
+        22,
+        89
+      ]
+    ],
+    "true_negatives": 92,
+    "false_positives": 37,
+    "false_negatives": 22,
+    "true_positives": 89,
+    "cross_validation": {
+      "cv_folds": 5,
+      "mean_accuracy": 0.7094,
+      "std_accuracy": 0.0111,
+      "fold_scores": [
+        0.7031,
+        0.724,
+        0.7083,
+        0.6927,
+        0.7188
+      ]
+    }
+  },
+  "all_model_comparisons": {
+    "Logistic Regression": {
+      "accuracy": 0.7542,
+      "accuracy_pct": 75.42,
+      "precision": 0.7063,
+      "recall": 0.8018,
+      "f1_score": 0.7511,
+      "roc_auc": 0.847,
+      "confusion_matrix": [
+        [
+          92,
+          37
+        ],
+        [
+          22,
+          89
+        ]
+      ],
+      "true_negatives": 92,
+      "false_positives": 37,
+      "false_negatives": 22,
+      "true_positives": 89,
+      "cross_validation": {
+        "cv_folds": 5,
+        "mean_accuracy": 0.7094,
+        "std_accuracy": 0.0111,
+        "fold_scores": [
+          0.7031,
+          0.724,
+          0.7083,
+          0.6927,
+          0.7188
+        ]
+      }
+    },
+    "Decision Tree": {
+      "accuracy": 0.6167,
+      "accuracy_pct": 61.67,
+      "precision": 0.5704,
+      "recall": 0.6937,
+      "f1_score": 0.626,
+      "roc_auc": 0.6717,
+      "confusion_matrix": [
+        [
+          71,
+          58
+        ],
+        [
+          34,
+          77
+        ]
+      ],
+      "true_negatives": 71,
+      "false_positives": 58,
+      "false_negatives": 34,
+      "true_positives": 77,
+      "cross_validation": {
+        "cv_folds": 5,
+        "mean_accuracy": 0.6344,
+        "std_accuracy": 0.0294,
+        "fold_scores": [
+          0.5885,
+          0.6406,
+          0.6667,
+          0.6146,
+          0.6615
+        ]
+      }
+    },
+    "Random Forest": {
+      "accuracy": 0.7208,
+      "accuracy_pct": 72.08,
+      "precision": 0.6618,
+      "recall": 0.8108,
+      "f1_score": 0.7287,
+      "roc_auc": 0.8216,
+      "confusion_matrix": [
+        [
+          83,
+          46
+        ],
+        [
+          21,
+          90
+        ]
+      ],
+      "true_negatives": 83,
+      "false_positives": 46,
+      "false_negatives": 21,
+      "true_positives": 90,
+      "cross_validation": {
+        "cv_folds": 5,
+        "mean_accuracy": 0.7063,
+        "std_accuracy": 0.0097,
+        "fold_scores": [
+          0.724,
+          0.6979,
+          0.7083,
+          0.6979,
+          0.7031
+        ]
+      }
+    },
+    "Gradient Boosting": {
+      "accuracy": 0.7333,
+      "accuracy_pct": 73.33,
+      "precision": 0.6911,
+      "recall": 0.7658,
+      "f1_score": 0.7265,
+      "roc_auc": 0.8101,
+      "confusion_matrix": [
+        [
+          91,
+          38
+        ],
+        [
+          26,
+          85
+        ]
+      ],
+      "true_negatives": 91,
+      "false_positives": 38,
+      "false_negatives": 26,
+      "true_positives": 85,
+      "cross_validation": {
+        "cv_folds": 5,
+        "mean_accuracy": 0.6865,
+        "std_accuracy": 0.0232,
+        "fold_scores": [
+          0.7031,
+          0.6979,
+          0.6979,
+          0.6406,
+          0.6927
+        ]
+      }
+    },
+    "KNN": {
+      "accuracy": 0.7167,
+      "accuracy_pct": 71.67,
+      "precision": 0.6807,
+      "recall": 0.7297,
+      "f1_score": 0.7043,
+      "roc_auc": 0.7688,
+      "confusion_matrix": [
+        [
+          91,
+          38
+        ],
+        [
+          30,
+          81
+        ]
+      ],
+      "true_negatives": 91,
+      "false_positives": 38,
+      "false_negatives": 30,
+      "true_positives": 81,
+      "cross_validation": {
+        "cv_folds": 5,
+        "mean_accuracy": 0.6375,
+        "std_accuracy": 0.0292,
+        "fold_scores": [
+          0.6198,
+          0.651,
+          0.625,
+          0.6042,
+          0.6875
+        ]
+      }
+    }
+  },
+  "model_path": "ml\\models\\diabetes_model.joblib",
+  "scaler_path": "ml\\models\\diabetes_scaler.joblib"
+}

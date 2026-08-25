@@ -1,0 +1,25 @@
+[
+  {
+    "user_id": "c0ee0d1d-998e-404d-8587-e70b38bb1891",
+    "username": "dr_sarah",
+    "full_name": "Sarah Jenkins",
+    "email": "dr.sarah@healthcare.local",
+    "phone": "+1-800-555-0101",
+    "specialization": "Cardiology & Internal Medicine",
+    "license_number": "MED-CARD-9921",
+    "department": "Primary Care",
+    "available_days": [
+      "Monday",
+      "Tuesday",
+      "Wednesday",
+      "Thursday",
+      "Friday"
+    ],
+    "consultation_hours": "09:00 - 17:00",
+    "rating": 4.9,
+    "is_available": true,
+    "id": "11a107d1-39e9-421b-8bb8-3ae238ba3d06",
+    "created_at": "2026-08-25T10:01:03.076971+00:00",
+    "updated_at": "2026-08-25T10:01:03.076971+00:00"
+  }
+]

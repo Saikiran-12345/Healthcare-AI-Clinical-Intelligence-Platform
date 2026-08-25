@@ -1,0 +1,103 @@
+{% extends 'base.html' %}
+
+{% block title %}Manage Appointments - HealthAI{% endblock %}
+{% block page_title %}Doctor Clinical Schedule & Appointment Management{% endblock %}
+
+{% block content %}
+<div class="grid grid-cols-1" style="gap: 1.5rem;">
+    <!-- Filter Tabs -->
+    <div class="card" style="padding: 1rem; display: flex; justify-content: space-between; align-items: center; flex-wrap: wrap; gap: 1rem;">
+        <div style="display: flex; gap: 0.5rem;">
+            <a href="/appointments/doctor-schedule/?status=ALL" class="btn btn-sm {% if status_filter == 'ALL' %}btn-primary{% else %}btn-outline{% endif %}">
+                All Consultations
+            </a>
+            <a href="/appointments/doctor-schedule/?status=Pending" class="btn btn-sm {% if status_filter == 'Pending' %}btn-primary{% else %}btn-outline{% endif %}">
+                Pending Requests ({{ pending_count }})
+            </a>
+            <a href="/appointments/doctor-schedule/?status=Approved" class="btn btn-sm {% if status_filter == 'Approved' %}btn-primary{% else %}btn-outline{% endif %}">
+                Confirmed / Upcoming
+            </a>
+            <a href="/appointments/doctor-schedule/?status=Completed" class="btn btn-sm {% if status_filter == 'Completed' %}btn-primary{% else %}btn-outline{% endif %}">
+                Completed
+            </a>
+        </div>
+    </div>
+
+    <!-- Appointments Table -->
+    <div class="card">
+        {% if appointments %}
+            <div class="table-responsive">
+                <table class="table">
+                    <thead>
+                        <tr>
+                            <th>Patient Name</th>
+                            <th>Date & Slot</th>
+                            <th>Chief Complaint</th>
+                            <th>Priority</th>
+                            <th>Status</th>
+                            <th>Doctor Notes</th>
+                            <th>Actions & Triage</th>
+                        </tr>
+                    </thead>
+                    <tbody>
+                        {% for appt in appointments %}
+                            <tr>
+                                <td>
+                                    <strong>{{ appt.patient_name }}</strong>
+                                    <div style="font-size: 0.78rem; color: var(--text-muted);">{{ appt.patient_email }}</div>
+                                </td>
+                                <td>
+                                    <strong>{{ appt.appointment_date }}</strong>
+                                    <div style="font-size: 0.85rem; color: var(--primary);">{{ appt.appointment_time }}</div>
+                                </td>
+                                <td style="max-width: 220px; font-size: 0.88rem;">{{ appt.reason }}</td>
+                                <td>
+                                    <span class="badge {% if appt.priority == 'Urgent' %}badge-high{% elif appt.priority == 'Follow-up' %}badge-info{% else %}badge-gray{% endif %}">
+                                        {{ appt.priority }}
+                                    </span>
+                                </td>
+                                <td>
+                                    <span class="badge {% if appt.status == 'Approved' %}badge-approved{% elif appt.status == 'Pending' %}badge-pending{% elif appt.status == 'Completed' %}badge-green{% elif appt.status == 'Rejected' %}badge-rejected{% else %}badge-gray{% endif %}">
+                                        {{ appt.status }}
+                                    </span>
+                                </td>
+                                <td style="max-width: 180px; font-size: 0.85rem; color: var(--text-muted);">
+                                    {{ appt.doctor_notes|default:'--' }}
+                                </td>
+                                <td>
+                                    {% if appt.status == 'Pending' %}
+                                        <form method="post" action="/appointments/action/{{ appt.id }}/" style="display: flex; gap: 0.35rem;">
+                                            {% csrf_token %}
+                                            <input type="hidden" name="action" value="approve">
+                                            <button type="submit" class="btn btn-primary btn-sm">Approve</button>
+                                        </form>
+                                        <form method="post" action="/appointments/action/{{ appt.id }}/" style="display: inline-block; margin-top: 0.25rem;">
+                                            {% csrf_token %}
+                                            <input type="hidden" name="action" value="reject">
+                                            <button type="submit" class="btn btn-outline btn-sm" style="color: var(--danger);">Decline</button>
+                                        </form>
+                                    {% elif appt.status == 'Approved' %}
+                                        <form method="post" action="/appointments/action/{{ appt.id }}/">
+                                            {% csrf_token %}
+                                            <input type="hidden" name="action" value="complete">
+                                            <button type="submit" class="btn btn-secondary btn-sm">Mark Complete</button>
+                                        </form>
+                                    {% else %}
+                                        <span style="font-size: 0.8rem; color: var(--text-muted);">Resolved</span>
+                                    {% endif %}
+                                </td>
+                            </tr>
+                        {% endfor %}
+                    </tbody>
+                </table>
+            </div>
+        {% else %}
+            <div style="text-align: center; padding: 4rem 1rem; color: var(--text-muted);">
+                <div style="font-size: 3rem; margin-bottom: 0.5rem;">📅</div>
+                <h4>No Appointments in this View</h4>
+                <p>There are no patient consultations currently matching the selected status filter.</p>
+            </div>
+        {% endif %}
+    </div>
+</div>
+{% endblock %}

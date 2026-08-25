@@ -1,0 +1,225 @@
+{
+  "disease_type": "kidney_disease",
+  "disease_key": "kidney_disease",
+  "best_algorithm": "KNN",
+  "features_used": [
+    "age",
+    "systolic_bp",
+    "glucose",
+    "cholesterol",
+    "water_intake",
+    "smoking",
+    "hypertension_flag",
+    "diabetes_flag",
+    "family_history"
+  ],
+  "feature_importance": {},
+  "metrics": {
+    "accuracy": 0.8083,
+    "accuracy_pct": 80.83,
+    "precision": 0.8537,
+    "recall": 0.7895,
+    "f1_score": 0.8203,
+    "roc_auc": 0.8597,
+    "confusion_matrix": [
+      [
+        89,
+        18
+      ],
+      [
+        28,
+        105
+      ]
+    ],
+    "true_negatives": 89,
+    "false_positives": 18,
+    "false_negatives": 28,
+    "true_positives": 105,
+    "cross_validation": {
+      "cv_folds": 5,
+      "mean_accuracy": 0.7406,
+      "std_accuracy": 0.0193,
+      "fold_scores": [
+        0.7604,
+        0.7344,
+        0.7604,
+        0.7396,
+        0.7083
+      ]
+    }
+  },
+  "all_model_comparisons": {
+    "Logistic Regression": {
+      "accuracy": 0.7875,
+      "accuracy_pct": 78.75,
+      "precision": 0.8417,
+      "recall": 0.7594,
+      "f1_score": 0.7984,
+      "roc_auc": 0.8824,
+      "confusion_matrix": [
+        [
+          88,
+          19
+        ],
+        [
+          32,
+          101
+        ]
+      ],
+      "true_negatives": 88,
+      "false_positives": 19,
+      "false_negatives": 32,
+      "true_positives": 101,
+      "cross_validation": {
+        "cv_folds": 5,
+        "mean_accuracy": 0.7812,
+        "std_accuracy": 0.0109,
+        "fold_scores": [
+          0.7917,
+          0.7656,
+          0.7917,
+          0.7865,
+          0.7708
+        ]
+      }
+    },
+    "Decision Tree": {
+      "accuracy": 0.7,
+      "accuracy_pct": 70.0,
+      "precision": 0.802,
+      "recall": 0.609,
+      "f1_score": 0.6923,
+      "roc_auc": 0.7808,
+      "confusion_matrix": [
+        [
+          87,
+          20
+        ],
+        [
+          52,
+          81
+        ]
+      ],
+      "true_negatives": 87,
+      "false_positives": 20,
+      "false_negatives": 52,
+      "true_positives": 81,
+      "cross_validation": {
+        "cv_folds": 5,
+        "mean_accuracy": 0.7229,
+        "std_accuracy": 0.0101,
+        "fold_scores": [
+          0.724,
+          0.7083,
+          0.7188,
+          0.724,
+          0.7396
+        ]
+      }
+    },
+    "Random Forest": {
+      "accuracy": 0.7875,
+      "accuracy_pct": 78.75,
+      "precision": 0.8361,
+      "recall": 0.7669,
+      "f1_score": 0.8,
+      "roc_auc": 0.869,
+      "confusion_matrix": [
+        [
+          87,
+          20
+        ],
+        [
+          31,
+          102
+        ]
+      ],
+      "true_negatives": 87,
+      "false_positives": 20,
+      "false_negatives": 31,
+      "true_positives": 102,
+      "cross_validation": {
+        "cv_folds": 5,
+        "mean_accuracy": 0.751,
+        "std_accuracy": 0.0141,
+        "fold_scores": [
+          0.7448,
+          0.7448,
+          0.7552,
+          0.776,
+          0.7344
+        ]
+      }
+    },
+    "Gradient Boosting": {
+      "accuracy": 0.7292,
+      "accuracy_pct": 72.92,
+      "precision": 0.7464,
+      "recall": 0.7744,
+      "f1_score": 0.7601,
+      "roc_auc": 0.841,
+      "confusion_matrix": [
+        [
+          72,
+          35
+        ],
+        [
+          30,
+          103
+        ]
+      ],
+      "true_negatives": 72,
+      "false_positives": 35,
+      "false_negatives": 30,
+      "true_positives": 103,
+      "cross_validation": {
+        "cv_folds": 5,
+        "mean_accuracy": 0.749,
+        "std_accuracy": 0.0288,
+        "fold_scores": [
+          0.7292,
+          0.7292,
+          0.7865,
+          0.7812,
+          0.7188
+        ]
+      }
+    },
+    "KNN": {
+      "accuracy": 0.8083,
+      "accuracy_pct": 80.83,
+      "precision": 0.8537,
+      "recall": 0.7895,
+      "f1_score": 0.8203,
+      "roc_auc": 0.8597,
+      "confusion_matrix": [
+        [
+          89,
+          18
+        ],
+        [
+          28,
+          105
+        ]
+      ],
+      "true_negatives": 89,
+      "false_positives": 18,
+      "false_negatives": 28,
+      "true_positives": 105,
+      "cross_validation": {
+        "cv_folds": 5,
+        "mean_accuracy": 0.7406,
+        "std_accuracy": 0.0193,
+        "fold_scores": [
+          0.7604,
+          0.7344,
+          0.7604,
+          0.7396,
+          0.7083
+        ]
+      }
+    }
+  },
+  "model_path": "ml\\models\\kidney_disease_model.joblib",
+  "scaler_path": "ml\\models\\kidney_disease_scaler.joblib"
+}

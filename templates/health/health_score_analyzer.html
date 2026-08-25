@@ -1,0 +1,161 @@
+{% extends 'base.html' %}
+
+{% block title %}Health Score Analyzer - HealthAI{% endblock %}
+{% block page_title %}Composite Health Score (0-100) & Physiological Synthesis{% endblock %}
+
+{% block content %}
+<div class="grid grid-cols-3">
+    <!-- Multi-Factor Input Form (1 col) -->
+    <div class="card">
+        <div class="card-header">
+            <h3 class="card-title">🩺 Enter Vital Parameters</h3>
+        </div>
+
+        <form method="get" action="">
+            <div class="grid grid-cols-2">
+                <div class="form-group">
+                    <label class="form-label" for="height_cm">Height (cm)</label>
+                    <input type="number" step="0.1" name="height_cm" id="height_cm" class="form-control" value="{{ request.GET.height_cm|default:'175' }}" required>
+                </div>
+                <div class="form-group">
+                    <label class="form-label" for="weight_kg">Weight (kg)</label>
+                    <input type="number" step="0.1" name="weight_kg" id="weight_kg" class="form-control" value="{{ request.GET.weight_kg|default:'72' }}" required>
+                </div>
+            </div>
+
+            <div class="grid grid-cols-2">
+                <div class="form-group">
+                    <label class="form-label" for="systolic_bp">Systolic BP</label>
+                    <input type="number" name="systolic_bp" id="systolic_bp" class="form-control" value="{{ request.GET.systolic_bp|default:'120' }}" required>
+                </div>
+                <div class="form-group">
+                    <label class="form-label" for="diastolic_bp">Diastolic BP</label>
+                    <input type="number" name="diastolic_bp" id="diastolic_bp" class="form-control" value="{{ request.GET.diastolic_bp|default:'80' }}" required>
+                </div>
+            </div>
+
+            <div class="grid grid-cols-2">
+                <div class="form-group">
+                    <label class="form-label" for="blood_glucose">Glucose (mg/dL)</label>
+                    <input type="number" step="0.1" name="blood_glucose" id="blood_glucose" class="form-control" value="{{ request.GET.blood_glucose|default:'95' }}" required>
+                </div>
+                <div class="form-group">
+                    <label class="form-label" for="cholesterol">Cholesterol</label>
+                    <input type="number" step="0.1" name="cholesterol" id="cholesterol" class="form-control" value="{{ request.GET.cholesterol|default:'185' }}" required>
+                </div>
+            </div>
+
+            <div class="grid grid-cols-2">
+                <div class="form-group">
+                    <label class="form-label" for="sleep_hours">Sleep (Hours)</label>
+                    <input type="number" step="0.5" name="sleep_hours" id="sleep_hours" class="form-control" value="{{ request.GET.sleep_hours|default:'7.5' }}" required>
+                </div>
+                <div class="form-group">
+                    <label class="form-label" for="water_intake_liters">Water (L)</label>
+                    <input type="number" step="0.1" name="water_intake_liters" id="water_intake_liters" class="form-control" value="{{ request.GET.water_intake_liters|default:'2.5' }}" required>
+                </div>
+            </div>
+
+            <div class="form-group">
+                <label class="form-label" for="stress_level">Stress Level (1-10)</label>
+                <input type="number" name="stress_level" id="stress_level" class="form-control" value="{{ request.GET.stress_level|default:'4' }}" min="1" max="10" required>
+            </div>
+
+            <button type="submit" class="btn btn-primary btn-block" style="margin-top: 1.5rem;">
+                Compute Health Score & Synthesis
+            </button>
+        </form>
+    </div>
+
+    <!-- Diagnostic Score Report (2 cols) -->
+    <div class="card" style="grid-column: span 2;">
+        <div class="card-header">
+            <h3 class="card-title">🌟 Holistic Diagnostic Health Score Synthesis</h3>
+        </div>
+
+        {% if result %}
+            <div style="display: flex; align-items: center; justify-content: space-around; padding: 1.5rem; background: #f8fafc; border-radius: var(--radius-lg); margin-bottom: 1.5rem;">
+                <div class="score-circle" style="--score-pct: {{ result.overall_score }}; width: 140px; height: 140px;">
+                    <div class="score-inner">
+                        <div class="score-number" style="font-size: 2.6rem;">{{ result.overall_score }}</div>
+                        <div class="score-max">/ 100</div>
+                    </div>
+                </div>
+
+                <div style="max-width: 340px;">
+                    <h3 style="font-size: 1.3rem; font-weight: 800; color: var(--text-main); margin-bottom: 0.25rem;">
+                        {% if result.overall_score >= 80 %}
+                            Optimal Health Status
+                        {% elif result.overall_score >= 60 %}
+                            Moderate Health Balance
+                        {% else %}
+                            Preventative Action Required
+                        {% endif %}
+                    </h3>
+                    <p style="font-size: 0.88rem; color: var(--text-muted); line-height: 1.5;">
+                        Multi-dimensional calculation integrating cardiovascular biomarkers, glycemic control, BMI metrics, hydration, and sleep hygiene.
+                    </p>
+                </div>
+            </div>
+
+            <!-- Dimension Score Breakdown Cards -->
+            <h4 style="font-size: 1rem; font-weight: 700; color: var(--text-main); margin-bottom: 1rem;">
+                📊 Dimensional Health Sub-Scores
+            </h4>
+            <div class="grid grid-cols-4" style="margin-bottom: 1.5rem;">
+                <div class="card stat-card" style="padding: 1rem;">
+                    <div class="stat-info">
+                        <div class="stat-value" style="font-size: 1.4rem;">{{ result.components.cardiovascular_score }}/100</div>
+                        <div class="stat-label">Cardiovascular</div>
+                    </div>
+                </div>
+
+                <div class="card stat-card" style="padding: 1rem;">
+                    <div class="stat-info">
+                        <div class="stat-value" style="font-size: 1.4rem;">{{ result.components.metabolic_score }}/100</div>
+                        <div class="stat-label">Glycemic / Labs</div>
+                    </div>
+                </div>
+
+                <div class="card stat-card" style="padding: 1rem;">
+                    <div class="stat-info">
+                        <div class="stat-value" style="font-size: 1.4rem;">{{ result.components.biometric_score }}/100</div>
+                        <div class="stat-label">Biometric BMI</div>
+                    </div>
+                </div>
+
+                <div class="card stat-card" style="padding: 1rem;">
+                    <div class="stat-info">
+                        <div class="stat-value" style="font-size: 1.4rem;">{{ result.components.lifestyle_score }}/100</div>
+                        <div class="stat-label">Lifestyle / Sleep</div>
+                    </div>
+                </div>
+            </div>
+
+            <!-- Detailed Interpretations -->
+            <div style="display: flex; flex-direction: column; gap: 0.75rem; font-size: 0.88rem;">
+                <div style="padding: 0.75rem 1rem; background: #f8fafc; border-left: 4px solid var(--primary); border-radius: var(--radius-sm);">
+                    <strong>⚖️ BMI Status:</strong> {{ result.bmi_details.bmi }} ({{ result.bmi_details.category }}) &bull; Target: {{ result.bmi_details.ideal_weight_min_kg }} - {{ result.bmi_details.ideal_weight_max_kg }} kg.
+                </div>
+
+                <div style="padding: 0.75rem 1rem; background: #f8fafc; border-left: 4px solid var(--danger); border-radius: var(--radius-sm);">
+                    <strong>❤️ Hemodynamics:</strong> {{ result.bp_details.systolic }}/{{ result.bp_details.diastolic }} mmHg ({{ result.bp_details.category }}) &bull; MAP: {{ result.bp_details.mean_arterial_pressure }} mmHg.
+                </div>
+
+                <div style="padding: 0.75rem 1rem; background: #f8fafc; border-left: 4px solid var(--secondary); border-radius: var(--radius-sm);">
+                    <strong>💧 Hydration:</strong> {{ result.hydration_details.hydration_score }}/100 ({{ result.hydration_details.status }}) &bull; Target: {{ result.hydration_details.target_liters }} L/day.
+                </div>
+
+                <div style="padding: 0.75rem 1rem; background: #f8fafc; border-left: 4px solid var(--accent); border-radius: var(--radius-sm);">
+                    <strong>🌙 Sleep Duration:</strong> {{ result.sleep_details.sleep_score }}/100 ({{ result.sleep_details.status }}) &bull; {{ result.sleep_details.sleep_hours }} hrs/night.
+                </div>
+            </div>
+        {% else %}
+            <div style="text-align: center; padding: 4rem 1rem; color: var(--text-muted);">
+                <div style="font-size: 3rem; margin-bottom: 0.5rem;">🌟</div>
+                <p>Adjust parameters on the left and click "Compute Health Score" to run full algorithmic analysis.</p>
+            </div>
+        {% endif %}
+    </div>
+</div>
+{% endblock %}

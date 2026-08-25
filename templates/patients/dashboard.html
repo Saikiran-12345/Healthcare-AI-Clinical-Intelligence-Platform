@@ -1,0 +1,248 @@
+{% extends 'base.html' %}
+
+{% block title %}Patient Dashboard - HealthAI{% endblock %}
+{% block page_title %}Patient Health Overview & Vitals{% endblock %}
+
+{% block content %}
+<div class="grid grid-cols-1" style="gap: 1.5rem;">
+    <!-- Welcome Header & Quick Action Row -->
+    <div class="card" style="background: linear-gradient(135deg, #0284c7 0%, #0369a1 100%); color: white;">
+        <div style="display: flex; justify-content: space-between; align-items: center; flex-wrap: wrap; gap: 1rem;">
+            <div>
+                <h2 style="font-size: 1.5rem; font-weight: 800; margin-bottom: 0.25rem;">
+                    Hello, {{ patient.full_name|default:user.username }}!
+                </h2>
+                <p style="opacity: 0.9; font-size: 0.95rem;">
+                    Your personalized clinical vitals, disease risk estimations, and AI insights.
+                </p>
+            </div>
+            <div style="display: flex; gap: 0.75rem;">
+                <a href="/patients/assessment/" class="btn btn-primary btn-sm" style="background: white; color: #0284c7; font-weight: 700;">
+                    + Log Health Vitals
+                </a>
+                <a href="/predictions/assess/" class="btn btn-outline btn-sm" style="color: white; border-color: rgba(255,255,255,0.4);">
+                    🧠 AI Disease Assessment
+                </a>
+                <a href="/patients/export/" class="btn btn-outline btn-sm" style="color: white; border-color: rgba(255,255,255,0.4);">
+                    📥 Export CSV
+                </a>
+            </div>
+        </div>
+    </div>
+
+    <!-- Health Score & Vitals Grid -->
+    <div class="grid grid-cols-4">
+        <!-- Composite Score -->
+        <div class="card health-score-container" style="grid-column: span 1; text-align: center;">
+            <div class="score-circle" style="--score-pct: {{ health_score }};">
+                <div class="score-inner">
+                    <div class="score-number">{{ health_score }}</div>
+                    <div class="score-max">/ 100</div>
+                </div>
+            </div>
+            <div style="margin-top: 1rem; font-weight: 700; font-size: 1rem; color: var(--text-main);">
+                Overall Health Score
+            </div>
+            <div style="font-size: 0.8rem; color: var(--text-muted);">
+                {% if health_score >= 80 %}Excellent Vital Status{% elif health_score >= 60 %}Moderate - Action Suggested{% else %}Attention Needed{% endif %}
+            </div>
+        </div>
+
+        <!-- BMI Card -->
+        <div class="card stat-card" style="grid-column: span 1;">
+            <div class="stat-icon blue">⚖️</div>
+            <div class="stat-info">
+                <div class="stat-value">{{ latest_profile.bmi|default:'--' }}</div>
+                <div class="stat-label">BMI ({{ latest_profile.bmi_category|default:'Pending' }})</div>
+                <div style="font-size: 0.75rem; color: var(--text-muted); margin-top: 0.25rem;">
+                    {{ latest_profile.weight_kg|default:'--' }} kg | {{ latest_profile.height_cm|default:'--' }} cm
+                </div>
+            </div>
+        </div>
+
+        <!-- Blood Pressure Card -->
+        <div class="card stat-card" style="grid-column: span 1;">
+            <div class="stat-icon red">❤️</div>
+            <div class="stat-info">
+                <div class="stat-value">
+                    {% if latest_profile %}{{ latest_profile.systolic_bp }}/{{ latest_profile.diastolic_bp }}{% else %}--/--{% endif %}
+                </div>
+                <div class="stat-label">Blood Pressure (mmHg)</div>
+                <div style="font-size: 0.75rem; color: var(--text-muted); margin-top: 0.25rem;">
+                    Heart Rate: {{ latest_profile.heart_rate|default:'--' }} bpm
+                </div>
+            </div>
+        </div>
+
+        <!-- Blood Glucose Card -->
+        <div class="card stat-card" style="grid-column: span 1;">
+            <div class="stat-icon amber">🩸</div>
+            <div class="stat-info">
+                <div class="stat-value">{{ latest_profile.blood_glucose|default:'--' }}</div>
+                <div class="stat-label">Blood Glucose (mg/dL)</div>
+                <div style="font-size: 0.75rem; color: var(--text-muted); margin-top: 0.25rem;">
+                    Cholesterol: {{ latest_profile.cholesterol|default:'--' }} mg/dL
+                </div>
+            </div>
+        </div>
+    </div>
+
+    <!-- Active Predictions and Medical Conditions Row -->
+    <div class="grid grid-cols-2">
+        <!-- Recent ML Predictions -->
+        <div class="card">
+            <div class="card-header">
+                <h3 class="card-title">🤖 AI Risk Predictions</h3>
+                <a href="/predictions/history/" class="btn btn-outline btn-sm">Full History</a>
+            </div>
+
+            {% if recent_predictions %}
+                <div class="table-responsive">
+                    <table class="table">
+                        <thead>
+                            <tr>
+                                <th>Disease Assessment</th>
+                                <th>Risk Level</th>
+                                <th>Probability</th>
+                                <th>Date</th>
+                            </tr>
+                        </thead>
+                        <tbody>
+                            {% for pred in recent_predictions %}
+                                <tr>
+                                    <td><strong>{{ pred.disease_type|title }}</strong></td>
+                                    <td>
+                                        <span class="badge {% if pred.risk_level == 'LOW' %}badge-low{% elif pred.risk_level == 'MODERATE' %}badge-moderate{% else %}badge-high{% endif %}">
+                                            {{ pred.risk_level }}
+                                        </span>
+                                    </td>
+                                    <td>{{ pred.probability_pct }}%</td>
+                                    <td>{{ pred.created_at|slice:":10" }}</td>
+                                </tr>
+                            {% endfor %}
+                        </tbody>
+                    </table>
+                </div>
+            {% else %}
+                <div style="text-align: center; padding: 2rem; color: var(--text-muted);">
+                    <div style="font-size: 2.5rem; margin-bottom: 0.5rem;">🧠</div>
+                    <p>No ML disease risk assessments recorded yet.</p>
+                    <a href="/predictions/assess/" class="btn btn-primary btn-sm" style="margin-top: 0.75rem;">Run First Assessment</a>
+                </div>
+            {% endif %}
+        </div>
+
+        <!-- Medical History & Conditions -->
+        <div class="card">
+            <div class="card-header">
+                <h3 class="card-title">📋 Medical History & Conditions</h3>
+                <a href="/patients/medical-history/" class="btn btn-outline btn-sm">+ Add Condition</a>
+            </div>
+
+            {% if medical_histories %}
+                <div class="table-responsive">
+                    <table class="table">
+                        <thead>
+                            <tr>
+                                <th>Condition</th>
+                                <th>Status</th>
+                                <th>Severity</th>
+                                <th>Diagnosed</th>
+                            </tr>
+                        </thead>
+                        <tbody>
+                            {% for record in medical_histories %}
+                                <tr>
+                                    <td><strong>{{ record.condition }}</strong></td>
+                                    <td><span class="badge badge-info">{{ record.status }}</span></td>
+                                    <td>{{ record.severity }}</td>
+                                    <td>{{ record.diagnosis_date }}</td>
+                                </tr>
+                            {% endfor %}
+                        </tbody>
+                    </table>
+                </div>
+            {% else %}
+                <div style="text-align: center; padding: 2rem; color: var(--text-muted);">
+                    <div style="font-size: 2.5rem; margin-bottom: 0.5rem;">📁</div>
+                    <p>No prior chronic conditions or diagnoses registered.</p>
+                    <a href="/patients/medical-history/" class="btn btn-outline btn-sm" style="margin-top: 0.75rem;">Manage History</a>
+                </div>
+            {% endif %}
+        </div>
+    </div>
+
+    <!-- Recommendations & Symptoms Row -->
+    <div class="grid grid-cols-2">
+        <!-- Personalized Recommendations -->
+        <div class="card">
+            <div class="card-header">
+                <h3 class="card-title">💡 Personalized Recommendations</h3>
+                <a href="/recommendations/" class="btn btn-outline btn-sm">View All</a>
+            </div>
+
+            {% if recommendations %}
+                <div style="display: flex; flex-direction: column; gap: 0.75rem;">
+                    {% for rec in recommendations %}
+                        <div style="padding: 0.85rem; border-radius: var(--radius-md); background: #f8fafc; border-left: 3px solid var(--primary);">
+                            <div style="display: flex; justify-content: space-between; margin-bottom: 0.25rem;">
+                                <strong style="font-size: 0.9rem; color: var(--primary);">{{ rec.category|title }}</strong>
+                                <span class="badge badge-gray">{{ rec.priority|default:'Normal' }}</span>
+                            </div>
+                            <p style="font-size: 0.85rem; color: var(--text-main); margin: 0;">{{ rec.title }}: {{ rec.description }}</p>
+                        </div>
+                    {% endfor %}
+                </div>
+            {% else %}
+                <div style="text-align: center; padding: 2rem; color: var(--text-muted);">
+                    <div style="font-size: 2.5rem; margin-bottom: 0.5rem;">✨</div>
+                    <p>Log your vitals or run an AI assessment to generate tailored guidance.</p>
+                </div>
+            {% endif %}
+        </div>
+
+        <!-- Recent Symptoms -->
+        <div class="card">
+            <div class="card-header">
+                <h3 class="card-title">🩺 Symptom Reports</h3>
+                <a href="/patients/symptoms/" class="btn btn-outline btn-sm">+ Log Symptom</a>
+            </div>
+
+            {% if recent_symptoms %}
+                <div class="table-responsive">
+                    <table class="table">
+                        <thead>
+                            <tr>
+                                <th>Symptom</th>
+                                <th>Category</th>
+                                <th>Severity</th>
+                                <th>Frequency</th>
+                            </tr>
+                        </thead>
+                        <tbody>
+                            {% for sym in recent_symptoms %}
+                                <tr>
+                                    <td><strong>{{ sym.symptom_name }}</strong></td>
+                                    <td>{{ sym.category }}</td>
+                                    <td>
+                                        <span class="badge {% if sym.severity >= 4 %}badge-high{% elif sym.severity >= 3 %}badge-moderate{% else %}badge-low{% endif %}">
+                                            Level {{ sym.severity }}/5
+                                        </span>
+                                    </td>
+                                    <td>{{ sym.frequency }}</td>
+                                </tr>
+                            {% endfor %}
+                        </tbody>
+                    </table>
+                </div>
+            {% else %}
+                <div style="text-align: center; padding: 2rem; color: var(--text-muted);">
+                    <div style="font-size: 2.5rem; margin-bottom: 0.5rem;">🩺</div>
+                    <p>No symptoms currently reported.</p>
+                    <a href="/patients/symptoms/" class="btn btn-outline btn-sm" style="margin-top: 0.75rem;">Log a Symptom</a>
+                </div>
+            {% endif %}
+        </div>
+    </div>
+</div>
+{% endblock %}

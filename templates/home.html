@@ -1,0 +1,121 @@
+{% extends 'base.html' %}
+
+{% block title %}Home - AI Healthcare Management & Health Risk Prediction{% endblock %}
+{% block page_title %}Healthcare AI & Clinical Intelligence Platform{% endblock %}
+
+{% block content %}
+<div class="grid grid-cols-1" style="gap: 2rem;">
+    <!-- Hero Banner -->
+    <div class="card" style="background: linear-gradient(135deg, #0284c7 0%, #0369a1 50%, #0f172a 100%); color: white; border: none; padding: 3rem 2.5rem;">
+        <div style="max-width: 800px;">
+            <div class="badge badge-info" style="background: rgba(255, 255, 255, 0.2); color: white; border: none; margin-bottom: 1rem;">
+                🧠 100% Local Machine Learning & Clinical AI
+            </div>
+            <h1 style="font-size: 2.5rem; font-weight: 800; line-height: 1.2; margin-bottom: 1rem;">
+                Predictive Health Risk Analytics & Patient Management
+            </h1>
+            <p style="font-size: 1.1rem; opacity: 0.9; margin-bottom: 2rem; line-height: 1.7;">
+                An intelligent healthcare web platform equipped with multi-model disease risk prediction (Diabetes, Heart Disease, Hypertension, Kidney Disease), clinical symptom NLP parsing, physiological score calculations, and triaged appointment workflows.
+            </p>
+            <div style="display: flex; gap: 1rem; flex-wrap: wrap;">
+                {% if not user.is_authenticated %}
+                    <a href="/accounts/register/" class="btn btn-primary btn-lg" style="background: white; color: #0284c7; font-weight: 700;">
+                        Patient Registration
+                    </a>
+                    <a href="/accounts/login/" class="btn btn-outline btn-lg" style="color: white; border-color: rgba(255,255,255,0.4);">
+                        Sign In to Portal
+                    </a>
+                {% else %}
+                    {% if user.role == 'patient' %}
+                        <a href="/patients/dashboard/" class="btn btn-primary btn-lg" style="background: white; color: #0284c7;">
+                            Go to Patient Dashboard
+                        </a>
+                        <a href="/predictions/assess/" class="btn btn-outline btn-lg" style="color: white; border-color: rgba(255,255,255,0.4);">
+                            Run AI Risk Assessment
+                        </a>
+                    {% elif user.role == 'doctor' %}
+                        <a href="/doctors/dashboard/" class="btn btn-primary btn-lg" style="background: white; color: #0284c7;">
+                            Doctor Clinical Portal
+                        </a>
+                    {% elif user.role == 'admin' %}
+                        <a href="/admin-panel/dashboard/" class="btn btn-primary btn-lg" style="background: white; color: #0284c7;">
+                            Admin Control Center
+                        </a>
+                    {% endif %}
+                {% endif %}
+                <a href="/health/calculators/" class="btn btn-outline btn-lg" style="color: white; border-color: rgba(255,255,255,0.4);">
+                    Health Calculators
+                </a>
+            </div>
+        </div>
+    </div>
+
+    <!-- Feature Pillars -->
+    <div class="grid grid-cols-4">
+        <div class="card stat-card">
+            <div class="stat-icon blue">🩺</div>
+            <div class="stat-info">
+                <div class="stat-value">4</div>
+                <div class="stat-label">ML Disease Models</div>
+            </div>
+        </div>
+
+        <div class="card stat-card">
+            <div class="stat-icon green">📊</div>
+            <div class="stat-info">
+                <div class="stat-value">11+</div>
+                <div class="stat-label">Health Calculators</div>
+            </div>
+        </div>
+
+        <div class="card stat-card">
+            <div class="stat-icon purple">💬</div>
+            <div class="stat-info">
+                <div class="stat-value">NLP</div>
+                <div class="stat-label">Symptom Analyzer</div>
+            </div>
+        </div>
+
+        <div class="card stat-card">
+            <div class="stat-icon amber">🔒</div>
+            <div class="stat-info">
+                <div class="stat-value">Zero-DB</div>
+                <div class="stat-label">Atomic JSON Storage</div>
+            </div>
+        </div>
+    </div>
+
+    <!-- Core Clinical Capabilities -->
+    <div class="grid grid-cols-3">
+        <div class="card">
+            <div class="card-header">
+                <h3 class="card-title">🤖 AI Risk Prediction</h3>
+            </div>
+            <p style="color: var(--text-muted); margin-bottom: 1.25rem; font-size: 0.95rem;">
+                Machine learning ensemble models evaluating clinical indicators to calculate risk probabilities for Diabetes, Heart Disease, Hypertension, and Chronic Kidney Disease.
+            </p>
+            <a href="/health/calculators/" class="btn btn-outline btn-sm">Explore Calculators &rarr;</a>
+        </div>
+
+        <div class="card">
+            <div class="card-header">
+                <h3 class="card-title">💬 Symptom NLP Engine</h3>
+            </div>
+            <p style="color: var(--text-muted); margin-bottom: 1.25rem; font-size: 0.95rem;">
+                Local natural language processing engine that tokenizes, stems, and matches free-form symptom descriptions to clinical terminology and severity categories.
+            </p>
+            <a href="/nlp/symptoms/" class="btn btn-outline btn-sm">Try Symptom Checker &rarr;</a>
+        </div>
+
+        <div class="card">
+            <div class="card-header">
+                <h3 class="card-title">👨‍⚕️ Clinical Triaging</h3>
+            </div>
+            <p style="color: var(--text-muted); margin-bottom: 1.25rem; font-size: 0.95rem;">
+                Doctor and patient appointment coordination with intelligent slot conflict detection, high-risk patient monitoring, and longitudinal medical history records.
+            </p>
+            <a href="/accounts/login/" class="btn btn-outline btn-sm">Access Portal &rarr;</a>
+        </div>
+    </div>
+</div>
+{% endblock %}

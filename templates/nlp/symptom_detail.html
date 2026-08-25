@@ -1,0 +1,111 @@
+{% extends 'base.html' %}
+
+{% block title %}Analysis Details - Health AI{% endblock %}
+
+{% block content %}
+<div class="container mt-4">
+    <div class="mb-3">
+        <a href="{% url 'nlp:symptom_history' %}" class="text-decoration-none">← Back to History</a>
+    </div>
+
+    {% if error %}
+    <div class="alert alert-danger">{{ error }}</div>
+    {% else %}
+    
+    <div class="card dashboard-card">
+        <div class="card-header bg-primary text-white d-flex justify-content-between align-items-center">
+            <h4 class="mb-0">Analysis Details</h4>
+            <span>{{ analysis.timestamp|slice:":10" }}</span>
+        </div>
+        
+        <div class="card-body">
+            <!-- Summary & Urgency -->
+            <div class="row mb-4">
+                <div class="col-md-9">
+                    <h5>Clinical Summary</h5>
+                    <p class="lead">{{ analysis.clinical_summary }}</p>
+                </div>
+                <div class="col-md-3 text-end">
+                    <h5>Urgency</h5>
+                    {% if analysis.urgency_level == 'EMERGENCY' %}
+                        <span class="badge bg-danger fs-5">🚨 EMERGENCY</span>
+                    {% elif analysis.urgency_level == 'URGENT' %}
+                        <span class="badge bg-warning text-dark fs-5">⚠️ URGENT</span>
+                    {% elif analysis.urgency_level == 'MODERATE' %}
+                        <span class="badge bg-info fs-5">🟡 MODERATE</span>
+                    {% else %}
+                        <span class="badge bg-success fs-5">🟢 ROUTINE</span>
+                    {% endif %}
+                </div>
+            </div>
+
+            <hr>
+
+            <div class="row mt-4">
+                <div class="col-md-6">
+                    <!-- Original Input -->
+                    <div class="mb-4">
+                        <h6 class="text-muted">Original Input</h6>
+                        <div class="p-3 bg-light rounded">
+                            <i>"{{ analysis.original_text }}"</i>
+                        </div>
+                    </div>
+
+                    <!-- Extracted Symptoms -->
+                    <div class="mb-4">
+                        <h6 class="text-muted">Extracted Symptoms</h6>
+                        <ul class="list-group">
+                            {% for sym in analysis.symptoms %}
+                            <li class="list-group-item d-flex justify-content-between align-items-center">
+                                {{ sym.name }}
+                                <span class="badge bg-secondary rounded-pill">Severity: {{ sym.severity }}/10</span>
+                            </li>
+                            {% endfor %}
+                        </ul>
+                    </div>
+                </div>
+
+                <div class="col-md-6">
+                    <!-- Disease Scores -->
+                    <div class="mb-4">
+                        <h6 class="text-muted">Matched Conditions</h6>
+                        <ul class="list-group">
+                            {% for ds in analysis.disease_scores %}
+                            <li class="list-group-item">
+                                <div class="d-flex justify-content-between mb-1">
+                                    <strong>{{ ds.disease }}</strong>
+                                    <span>{{ ds.probability }}%</span>
+                                </div>
+                                <div class="progress" style="height: 6px;">
+                                    <div class="progress-bar {% if ds.probability > 70 %}bg-danger{% elif ds.probability > 40 %}bg-warning{% else %}bg-info{% endif %}" 
+                                         role="progressbar" style="width: {{ ds.probability }}%;"></div>
+                                </div>
+                            </li>
+                            {% empty %}
+                            <li class="list-group-item text-muted">No specific conditions matched.</li>
+                            {% endfor %}
+                        </ul>
+                    </div>
+
+                    <!-- Recommended Specialists -->
+                    <div class="mb-4">
+                        <h6 class="text-muted">Recommendations</h6>
+                        <div class="card bg-light border-0">
+                            <div class="card-body">
+                                <strong>Consult:</strong>
+                                <ul>
+                                    {% for spec in analysis.recommended_specialists %}
+                                        <li>{{ spec }}</li>
+                                    {% endfor %}
+                                </ul>
+                            </div>
+                        </div>
+                    </div>
+                </div>
+            </div>
+
+        </div>
+    </div>
+    {% endif %}
+</div>
+{% endblock %}

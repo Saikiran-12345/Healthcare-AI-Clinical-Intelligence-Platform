@@ -1,0 +1,132 @@
+{% extends 'base.html' %}
+
+{% block title %}AI Symptom Checker - Health AI{% endblock %}
+
+{% block content %}
+<div class="container mt-4">
+    <div class="row">
+        <div class="col-md-8 offset-md-2">
+            <h2 class="mb-4">🤖 AI Symptom Checker</h2>
+            <p class="text-muted">Describe how you're feeling in your own words, and our NLP engine will analyze your symptoms.</p>
+            
+            <div class="card dashboard-card mb-4">
+                <div class="card-body">
+                    <form method="POST" id="symptomForm">
+                        {% csrf_token %}
+                        <div class="form-group mb-3">
+                            <label for="symptoms" class="form-label fw-bold">How are you feeling today?</label>
+                            <textarea class="form-control" id="symptoms" name="symptoms" rows="4" placeholder="e.g., I've had a severe headache and pounding chest pain since yesterday morning. I also feel slightly nauseous." required>{{ original_text|default:'' }}</textarea>
+                        </div>
+                        <button type="submit" class="btn btn-primary w-100" id="submitBtn">
+                            <span class="spinner-border spinner-border-sm d-none" id="loadingSpinner" role="status" aria-hidden="true"></span>
+                            🔍 Analyze Symptoms
+                        </button>
+                    </form>
+                </div>
+            </div>
+
+            {% if error %}
+            <div class="alert alert-warning">
+                <strong>Notice:</strong> {{ error }}
+            </div>
+            {% endif %}
+
+            {% if result %}
+            <div class="card dashboard-card mb-4 border-primary">
+                <div class="card-header bg-primary text-white">
+                    <h4 class="mb-0">📊 Analysis Results</h4>
+                </div>
+                <div class="card-body">
+                    
+                    <!-- Urgency & Summary -->
+                    <div class="d-flex justify-content-between align-items-start mb-3">
+                        <div>
+                            <h5>Clinical Summary</h5>
+                            <p class="mb-0">{{ result.clinical_summary }}</p>
+                        </div>
+                        <div>
+                            {% if result.urgency_level == 'EMERGENCY' %}
+                                <span class="badge bg-danger fs-5">🚨 EMERGENCY</span>
+                            {% elif result.urgency_level == 'URGENT' %}
+                                <span class="badge bg-warning text-dark fs-5">⚠️ URGENT</span>
+                            {% elif result.urgency_level == 'MODERATE' %}
+                                <span class="badge bg-info fs-5">🟡 MODERATE</span>
+                            {% else %}
+                                <span class="badge bg-success fs-5">🟢 ROUTINE</span>
+                            {% endif %}
+                        </div>
+                    </div>
+                    
+                    <hr>
+
+                    <!-- Extracted Symptoms -->
+                    <div class="mb-4">
+                        <h6 class="text-muted">Extracted Symptoms</h6>
+                        <div>
+                            {% for sym in result.symptoms %}
+                                <span class="badge bg-secondary me-1 mb-1 fs-6">{{ sym.name }}</span>
+                            {% endfor %}
+                        </div>
+                    </div>
+
+                    <!-- Disease Matches -->
+                    <div class="mb-4">
+                        <h6 class="text-muted">Potential Conditions</h6>
+                        {% for ds in result.disease_scores %}
+                        <div class="mb-2">
+                            <div class="d-flex justify-content-between">
+                                <span><strong>{{ ds.disease }}</strong></span>
+                                <span>{{ ds.probability }}%</span>
+                            </div>
+                            <div class="progress" style="height: 10px;">
+                                <div class="progress-bar {% if ds.probability > 70 %}bg-danger{% elif ds.probability > 40 %}bg-warning{% else %}bg-info{% endif %}" 
+                                     role="progressbar" 
+                                     style="width: {{ ds.probability }}%;" 
+                                     aria-valuenow="{{ ds.probability }}" aria-valuemin="0" aria-valuemax="100">
+                                </div>
+                            </div>
+                        </div>
+                        {% empty %}
+                        <p class="text-muted small">No specific conditions confidently matched.</p>
+                        {% endfor %}
+                    </div>
+
+                    <!-- Recommendations -->
+                    <div class="mb-3">
+                        <h6 class="text-muted">Recommended Specialists</h6>
+                        <ul class="list-unstyled">
+                            {% for spec in result.recommended_specialists %}
+                                <li>🩺 {{ spec }}</li>
+                            {% endfor %}
+                        </ul>
+                    </div>
+
+                </div>
+                <div class="card-footer bg-light">
+                    <div class="alert alert-secondary mb-0 p-2 small">
+                        <strong>Disclaimer:</strong> This tool is powered by AI for informational purposes only. It is NOT a substitute for professional medical advice, diagnosis, or treatment. If you are experiencing a medical emergency, please call your local emergency services immediately.
+                    </div>
+                </div>
+            </div>
+            
+            {% if request.session.user_id %}
+            <div class="text-center">
+                <a href="{% url 'nlp:symptom_history' %}" class="btn btn-outline-secondary">View My History</a>
+            </div>
+            {% endif %}
+
+            {% endif %}
+
+        </div>
+    </div>
+</div>
+{% endblock %}
+
+{% block extra_js %}
+<script>
+    document.getElementById('symptomForm').addEventListener('submit', function() {
+        document.getElementById('submitBtn').disabled = true;
+        document.getElementById('loadingSpinner').classList.remove('d-none');
+    });
+</script>
+{% endblock %}

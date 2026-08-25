@@ -1,0 +1,75 @@
+{% extends 'base.html' %}
+
+{% block title %}BMI Calculator - HealthAI{% endblock %}
+{% block page_title %}Body Mass Index (BMI) & Ideal Weight Calculator{% endblock %}
+
+{% block content %}
+<div class="grid grid-cols-2">
+    <!-- Input Form -->
+    <div class="card">
+        <div class="card-header">
+            <h3 class="card-title">⚖️ Enter Body Metrics</h3>
+        </div>
+
+        <form method="get" action="">
+            <div class="form-group">
+                <label class="form-label" for="height">Height (in centimeters)</label>
+                <input type="number" step="0.1" name="height" id="height" class="form-control" value="{{ height }}" required>
+            </div>
+
+            <div class="form-group">
+                <label class="form-label" for="weight">Weight (in kilograms)</label>
+                <input type="number" step="0.1" name="weight" id="weight" class="form-control" value="{{ weight }}" required>
+            </div>
+
+            <button type="submit" class="btn btn-primary btn-block" style="margin-top: 1.5rem;">
+                Compute BMI & Weight Classification
+            </button>
+        </form>
+    </div>
+
+    <!-- Results Display -->
+    <div class="card">
+        <div class="card-header">
+            <h3 class="card-title">📊 Clinical Interpretation</h3>
+        </div>
+
+        {% if result %}
+            <div style="text-align: center; padding: 1.5rem 0;">
+                <div style="font-size: 3rem; font-weight: 800; color: var(--primary);">
+                    {{ result.bmi }}
+                </div>
+                <div style="margin-top: 0.5rem;">
+                    <span class="badge badge-{{ result.badge_color }}" style="font-size: 1rem; padding: 0.4rem 1rem;">
+                        {{ result.category }}
+                    </span>
+                </div>
+                <p style="color: var(--text-muted); font-size: 0.9rem; margin-top: 1rem; max-width: 380px; margin-left: auto; margin-right: auto;">
+                    {{ result.risk_note }}
+                </p>
+            </div>
+
+            <div style="background: #f8fafc; border: 1px solid var(--border-color); border-radius: var(--radius-md); padding: 1.25rem; margin-top: 1rem;">
+                <div style="font-weight: 700; margin-bottom: 0.5rem; color: var(--text-main);">Target Healthy Weight Range:</div>
+                <div style="font-size: 1.1rem; color: var(--success); font-weight: 700;">
+                    {{ result.ideal_weight_min_kg }} kg &mdash; {{ result.ideal_weight_max_kg }} kg
+                </div>
+                <div style="font-size: 0.85rem; color: var(--text-muted); margin-top: 0.4rem;">
+                    {% if result.weight_diff_kg > 0 %}
+                        Current weight is <strong>{{ result.weight_diff_kg }} kg</strong> above upper normal bound.
+                    {% elif result.weight_diff_kg < 0 %}
+                        Current weight is <strong>{{ result.weight_diff_kg|stringformat:"f"|slice:"1:" }} kg</strong> below lower normal bound.
+                    {% else %}
+                        Current weight is in the optimal healthy range.
+                    {% endif %}
+                </div>
+            </div>
+        {% else %}
+            <div style="text-align: center; padding: 3rem; color: var(--text-muted);">
+                <div style="font-size: 3rem; margin-bottom: 0.5rem;">⚖️</div>
+                <p>Enter your height and weight on the left to view your BMI assessment.</p>
+            </div>
+        {% endif %}
+    </div>
+</div>
+{% endblock %}

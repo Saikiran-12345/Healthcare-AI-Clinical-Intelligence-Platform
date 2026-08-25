@@ -1,0 +1,15 @@
+{% extends 'base.html' %}
+
+{% block title %}500 - System Error | HealthAI{% endblock %}
+{% block page_title %}500 - Application Error{% endblock %}
+
+{% block content %}
+<div style="text-align: center; padding: 4rem 1rem;">
+    <div style="font-size: 4rem; margin-bottom: 1rem;">⚠️</div>
+    <h1 style="font-size: 2rem; font-weight: 800; margin-bottom: 0.5rem;">Internal Processing Error</h1>
+    <p style="color: var(--text-muted); max-width: 500px; margin: 0 auto 2rem;">
+        An unexpected error occurred while processing health data or machine learning pipelines. The event has been captured in audit logs.
+    </p>
+    <a href="/" class="btn btn-primary">Return to Homepage</a>
+</div>
+{% endblock %}

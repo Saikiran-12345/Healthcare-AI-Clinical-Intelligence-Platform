@@ -1,0 +1,102 @@
+{% extends 'base.html' %}
+
+{% block title %}Patient Symptoms Log - HealthAI{% endblock %}
+{% block page_title %}Symptom Logger & History{% endblock %}
+
+{% block content %}
+<div class="grid grid-cols-3">
+    <!-- Log Symptom Form -->
+    <div class="card">
+        <div class="card-header">
+            <h3 class="card-title">+ Report Symptoms</h3>
+        </div>
+
+        <form method="post" action="">
+            {% csrf_token %}
+
+            <div class="form-group">
+                <label class="form-label" for="{{ form.symptom_name.id_for_label }}">{{ form.symptom_name.label }} *</label>
+                {{ form.symptom_name }}
+            </div>
+
+            <div class="form-group">
+                <label class="form-label" for="{{ form.category.id_for_label }}">{{ form.category.label }}</label>
+                {{ form.category }}
+            </div>
+
+            <div class="form-group">
+                <label class="form-label" for="{{ form.severity.id_for_label }}">{{ form.severity.label }}</label>
+                {{ form.severity }}
+            </div>
+
+            <div class="grid grid-cols-2">
+                <div class="form-group">
+                    <label class="form-label" for="{{ form.duration_days.id_for_label }}">{{ form.duration_days.label }}</label>
+                    {{ form.duration_days }}
+                </div>
+
+                <div class="form-group">
+                    <label class="form-label" for="{{ form.frequency.id_for_label }}">{{ form.frequency.label }}</label>
+                    {{ form.frequency }}
+                </div>
+            </div>
+
+            <div class="form-group">
+                <label class="form-label" for="{{ form.notes.id_for_label }}">{{ form.notes.label }}</label>
+                {{ form.notes }}
+            </div>
+
+            <button type="submit" class="btn btn-primary btn-block">
+                Log Symptom
+            </button>
+        </form>
+    </div>
+
+    <!-- Logged Symptoms List -->
+    <div class="card" style="grid-column: span 2;">
+        <div class="card-header">
+            <h3 class="card-title">Recorded Symptoms Log</h3>
+            <a href="/nlp/symptoms/" class="btn btn-outline btn-sm">💬 NLP Symptom Matcher</a>
+        </div>
+
+        {% if symptoms %}
+            <div class="table-responsive">
+                <table class="table">
+                    <thead>
+                        <tr>
+                            <th>Symptom</th>
+                            <th>Category</th>
+                            <th>Severity</th>
+                            <th>Duration</th>
+                            <th>Frequency</th>
+                            <th>Reported At</th>
+                        </tr>
+                    </thead>
+                    <tbody>
+                        {% for sym in symptoms %}
+                            <tr>
+                                <td><strong>{{ sym.symptom_name }}</strong></td>
+                                <td><span class="badge badge-gray">{{ sym.category }}</span></td>
+                                <td>
+                                    <span class="badge {% if sym.severity >= 4 %}badge-high{% elif sym.severity >= 3 %}badge-moderate{% else %}badge-low{% endif %}">
+                                        Level {{ sym.severity }}/5
+                                    </span>
+                                </td>
+                                <td>{{ sym.duration_days }} day(s)</td>
+                                <td>{{ sym.frequency }}</td>
+                                <td style="font-size: 0.85rem; color: var(--text-muted);">{{ sym.logged_at|slice:":10" }}</td>
+                            </tr>
+                        {% endfor %}
+                    </tbody>
+                </table>
+            </div>
+        {% else %}
+            <div style="text-align: center; padding: 3rem; color: var(--text-muted);">
+                <div style="font-size: 3rem; margin-bottom: 0.5rem;">🩺</div>
+                <h4>No Symptoms Recorded</h4>
+                <p>Use the form to document any active symptoms or discomfort for clinical monitoring.</p>
+            </div>
+        {% endif %}
+    </div>
+</div>
+{% endblock %}

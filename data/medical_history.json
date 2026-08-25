@@ -1,0 +1,15 @@
+[
+  {
+    "patient_id": "32772e1f-e3e2-4184-812c-a672c805c3f7",
+    "user_id": "272140d2-02fa-4e38-9dca-f9bedfec0cba",
+    "condition": "asthma",
+    "diagnosis_date": "2026-08-04",
+    "status": "Active",
+    "severity": "Moderate",
+    "notes": "take prescriptions",
+    "recorded_at": "2026-08-25T10:07:22.013675+00:00",
+    "id": "a8c0c11f-d3a5-443a-b5c4-47b45ba9b841",
+    "created_at": "2026-08-25T10:07:22.013675+00:00",
+    "updated_at": "2026-08-25T10:07:22.013675+00:00"
+  }
+]

@@ -1,0 +1,215 @@
+{% extends 'base.html' %}
+
+{% block title %}Health Assessment & Vitals - HealthAI{% endblock %}
+{% block page_title %}Comprehensive Health Profile Assessment{% endblock %}
+
+{% block content %}
+<div style="max-width: 900px; margin: 0 auto;">
+    <div class="card" style="padding: 2.25rem;">
+        <div class="card-header" style="margin-bottom: 1.5rem;">
+            <div>
+                <h3 class="card-title">🩺 Enter Clinical Vitals & Lifestyle Metrics</h3>
+                <p class="card-subtitle">Values are validated locally and used to compute your physiological scores and disease risk estimates.</p>
+            </div>
+        </div>
+
+        <form method="post" action="">
+            {% csrf_token %}
+
+            <!-- Section 1: Biometrics -->
+            <h4 style="font-size: 1rem; font-weight: 700; color: var(--primary); margin-bottom: 1rem; border-bottom: 1px solid var(--border-color); padding-bottom: 0.4rem;">
+                1. Biometrics & Demographics
+            </h4>
+            <div class="grid grid-cols-4">
+                <div class="form-group">
+                    <label class="form-label" for="{{ form.age.id_for_label }}">{{ form.age.label }} *</label>
+                    {{ form.age }}
+                    {% if form.age.errors %}<div class="form-error">{{ form.age.errors.0 }}</div>{% endif %}
+                </div>
+
+                <div class="form-group">
+                    <label class="form-label" for="{{ form.gender.id_for_label }}">{{ form.gender.label }}</label>
+                    {{ form.gender }}
+                </div>
+
+                <div class="form-group">
+                    <label class="form-label" for="{{ form.height_cm.id_for_label }}">{{ form.height_cm.label }} *</label>
+                    {{ form.height_cm }}
+                    {% if form.height_cm.errors %}<div class="form-error">{{ form.height_cm.errors.0 }}</div>{% endif %}
+                </div>
+
+                <div class="form-group">
+                    <label class="form-label" for="{{ form.weight_kg.id_for_label }}">{{ form.weight_kg.label }} *</label>
+                    {{ form.weight_kg }}
+                    {% if form.weight_kg.errors %}<div class="form-error">{{ form.weight_kg.errors.0 }}</div>{% endif %}
+                </div>
+            </div>
+
+            <!-- Real-time Live BMI preview widget -->
+            <div id="liveBmiContainer" style="background: #f0fdf4; border: 1px solid #bbf7d0; border-radius: var(--radius-md); padding: 0.75rem 1rem; margin-bottom: 1.5rem; display: flex; align-items: center; justify-content: space-between;">
+                <div>
+                    <span style="font-weight: 700; color: #166534;">Live Calculated BMI:</span>
+                    <span id="liveBmiValue" style="font-weight: 800; font-size: 1.1rem; color: #15803d; margin-left: 0.5rem;">--</span>
+                    <span id="liveBmiCategory" class="badge badge-green" style="margin-left: 0.5rem;">Normal</span>
+                </div>
+                <div style="font-size: 0.78rem; color: #166534;">Auto-computed from Height & Weight</div>
+            </div>
+
+            <!-- Section 2: Clinical Vitals & Biomarkers -->
+            <h4 style="font-size: 1rem; font-weight: 700; color: var(--primary); margin-bottom: 1rem; border-bottom: 1px solid var(--border-color); padding-bottom: 0.4rem;">
+                2. Cardiovascular & Metabolic Biomarkers
+            </h4>
+            <div class="grid grid-cols-3">
+                <div class="form-group">
+                    <label class="form-label" for="{{ form.systolic_bp.id_for_label }}">{{ form.systolic_bp.label }} *</label>
+                    {{ form.systolic_bp }}
+                    <div class="form-help">{{ form.systolic_bp.help_text }}</div>
+                    {% if form.systolic_bp.errors %}<div class="form-error">{{ form.systolic_bp.errors.0 }}</div>{% endif %}
+                </div>
+
+                <div class="form-group">
+                    <label class="form-label" for="{{ form.diastolic_bp.id_for_label }}">{{ form.diastolic_bp.label }} *</label>
+                    {{ form.diastolic_bp }}
+                    <div class="form-help">{{ form.diastolic_bp.help_text }}</div>
+                    {% if form.diastolic_bp.errors %}<div class="form-error">{{ form.diastolic_bp.errors.0 }}</div>{% endif %}
+                </div>
+
+                <div class="form-group">
+                    <label class="form-label" for="{{ form.heart_rate.id_for_label }}">{{ form.heart_rate.label }} *</label>
+                    {{ form.heart_rate }}
+                    {% if form.heart_rate.errors %}<div class="form-error">{{ form.heart_rate.errors.0 }}</div>{% endif %}
+                </div>
+            </div>
+
+            <div class="grid grid-cols-2">
+                <div class="form-group">
+                    <label class="form-label" for="{{ form.blood_glucose.id_for_label }}">{{ form.blood_glucose.label }} *</label>
+                    {{ form.blood_glucose }}
+                    <div class="form-help">{{ form.blood_glucose.help_text }}</div>
+                    {% if form.blood_glucose.errors %}<div class="form-error">{{ form.blood_glucose.errors.0 }}</div>{% endif %}
+                </div>
+
+                <div class="form-group">
+                    <label class="form-label" for="{{ form.cholesterol.id_for_label }}">{{ form.cholesterol.label }} *</label>
+                    {{ form.cholesterol }}
+                    <div class="form-help">{{ form.cholesterol.help_text }}</div>
+                    {% if form.cholesterol.errors %}<div class="form-error">{{ form.cholesterol.errors.0 }}</div>{% endif %}
+                </div>
+            </div>
+
+            <!-- Section 3: Lifestyle & Behavioral Habits -->
+            <h4 style="font-size: 1rem; font-weight: 700; color: var(--primary); margin-bottom: 1rem; border-bottom: 1px solid var(--border-color); padding-bottom: 0.4rem; margin-top: 1rem;">
+                3. Lifestyle & Wellness Habits
+            </h4>
+            <div class="grid grid-cols-3">
+                <div class="form-group">
+                    <label class="form-label" for="{{ form.smoking_status.id_for_label }}">{{ form.smoking_status.label }}</label>
+                    {{ form.smoking_status }}
+                </div>
+
+                <div class="form-group">
+                    <label class="form-label" for="{{ form.alcohol_consumption.id_for_label }}">{{ form.alcohol_consumption.label }}</label>
+                    {{ form.alcohol_consumption }}
+                </div>
+
+                <div class="form-group">
+                    <label class="form-label" for="{{ form.physical_activity_level.id_for_label }}">{{ form.physical_activity_level.label }}</label>
+                    {{ form.physical_activity_level }}
+                </div>
+            </div>
+
+            <div class="grid grid-cols-4">
+                <div class="form-group">
+                    <label class="form-label" for="{{ form.exercise_frequency_days.id_for_label }}">{{ form.exercise_frequency_days.label }}</label>
+                    {{ form.exercise_frequency_days }}
+                </div>
+
+                <div class="form-group">
+                    <label class="form-label" for="{{ form.sleep_hours.id_for_label }}">{{ form.sleep_hours.label }}</label>
+                    {{ form.sleep_hours }}
+                </div>
+
+                <div class="form-group">
+                    <label class="form-label" for="{{ form.water_intake_liters.id_for_label }}">{{ form.water_intake_liters.label }}</label>
+                    {{ form.water_intake_liters }}
+                </div>
+
+                <div class="form-group">
+                    <label class="form-label" for="{{ form.stress_level.id_for_label }}">{{ form.stress_level.label }}</label>
+                    {{ form.stress_level }}
+                </div>
+            </div>
+
+            <div class="form-group">
+                <label class="form-label" for="{{ form.diet_type.id_for_label }}">{{ form.diet_type.label }}</label>
+                {{ form.diet_type }}
+            </div>
+
+            <!-- Section 4: Family History -->
+            <h4 style="font-size: 1rem; font-weight: 700; color: var(--primary); margin-bottom: 1rem; border-bottom: 1px solid var(--border-color); padding-bottom: 0.4rem; margin-top: 1rem;">
+                4. Hereditary & Family Medical History
+            </h4>
+            <div class="grid grid-cols-2" style="gap: 1rem; margin-bottom: 1.5rem;">
+                <label style="display: flex; align-items: center; gap: 0.5rem; cursor: pointer; font-size: 0.925rem;">
+                    {{ form.fam_diabetes }} {{ form.fam_diabetes.label }}
+                </label>
+                <label style="display: flex; align-items: center; gap: 0.5rem; cursor: pointer; font-size: 0.925rem;">
+                    {{ form.fam_heart_disease }} {{ form.fam_heart_disease.label }}
+                </label>
+                <label style="display: flex; align-items: center; gap: 0.5rem; cursor: pointer; font-size: 0.925rem;">
+                    {{ form.fam_hypertension }} {{ form.fam_hypertension.label }}
+                </label>
+                <label style="display: flex; align-items: center; gap: 0.5rem; cursor: pointer; font-size: 0.925rem;">
+                    {{ form.fam_kidney_disease }} {{ form.fam_kidney_disease.label }}
+                </label>
+            </div>
+
+            <div style="display: flex; justify-content: space-between; align-items: center; margin-top: 2rem;">
+                <a href="/patients/dashboard/" class="btn btn-outline">Cancel</a>
+                <button type="submit" class="btn btn-primary btn-lg">
+                    💾 Save Health Assessment
+                </button>
+            </div>
+        </form>
+    </div>
+</div>
+
+<script>
+    // Live BMI calculation preview
+    function updateLiveBmi() {
+        const heightEl = document.getElementById('input_height');
+        const weightEl = document.getElementById('input_weight');
+        const valEl = document.getElementById('liveBmiValue');
+        const catEl = document.getElementById('liveBmiCategory');
+
+        if (heightEl && weightEl && valEl && catEl) {
+            const h = parseFloat(heightEl.value);
+            const w = parseFloat(weightEl.value);
+
+            if (h > 0 && w > 0) {
+                const heightM = h / 100.0;
+                const bmi = (w / (heightM * heightM)).toFixed(2);
+                valEl.innerText = bmi;
+
+                if (bmi < 18.5) {
+                    catEl.innerText = 'Underweight';
+                    catEl.className = 'badge badge-amber';
+                } else if (bmi < 25.0) {
+                    catEl.innerText = 'Normal Weight';
+                    catEl.className = 'badge badge-green';
+                } else if (bmi < 30.0) {
+                    catEl.innerText = 'Overweight';
+                    catEl.className = 'badge badge-amber';
+                } else {
+                    catEl.innerText = 'Obese';
+                    catEl.className = 'badge badge-red';
+                }
+            }
+        }
+    }
+
+    document.getElementById('input_height')?.addEventListener('input', updateLiveBmi);
+    document.getElementById('input_weight')?.addEventListener('input', updateLiveBmi);
+    document.addEventListener('DOMContentLoaded', updateLiveBmi);
+</script>
+{% endblock %}

@@ -1,0 +1,180 @@
+{% extends 'base.html' %}
+
+{% block title %}AI Health Risk Assessment - HealthAI{% endblock %}
+{% block page_title %}Predictive AI Disease Risk Assessment{% endblock %}
+
+{% block content %}
+<div class="grid grid-cols-1" style="gap: 1.5rem;">
+    <!-- Disease Selection Tabs -->
+    <div class="card" style="padding: 1.25rem;">
+        <div style="font-size: 0.85rem; font-weight: 700; color: var(--text-muted); text-transform: uppercase; margin-bottom: 0.75rem;">
+            Select Target Health Condition for Machine Learning Analysis:
+        </div>
+        <div style="display: flex; gap: 0.75rem; flex-wrap: wrap;">
+            {% for d in available_diseases %}
+                <a href="/predictions/assess/?disease={{ d }}"
+                   class="btn {% if selected_disease == d %}btn-primary{% else %}btn-outline{% endif %}">
+                    {% if d == 'Diabetes' %}🩸{% elif d == 'Heart Disease' %}❤️{% elif d == 'Hypertension' %}⚡{% else %}🧪{% endif %}
+                    {{ d }} Risk Model
+                </a>
+            {% endfor %}
+        </div>
+    </div>
+
+    <!-- Prediction Form & Result Card -->
+    <div class="grid grid-cols-2">
+        <!-- Input Form -->
+        <div class="card">
+            <div class="card-header">
+                <h3 class="card-title">🩺 Input Biomarkers for {{ selected_disease }}</h3>
+            </div>
+
+            <form method="post" action="">
+                {% csrf_token %}
+                <input type="hidden" name="disease_type" value="{{ selected_disease }}">
+
+                <div class="grid grid-cols-2">
+                    <div class="form-group">
+                        <label class="form-label" for="age">Age (Years)</label>
+                        <input type="number" name="age" id="age" class="form-control" value="{{ latest_profile.age|default:'45' }}" required>
+                    </div>
+
+                    <div class="form-group">
+                        <label class="form-label" for="gender">Biological Sex</label>
+                        <select name="gender" id="gender" class="form-select">
+                            <option value="male" {% if latest_profile.gender == 'male' %}selected{% endif %}>Male</option>
+                            <option value="female" {% if latest_profile.gender == 'female' %}selected{% endif %}>Female</option>
+                        </select>
+                    </div>
+                </div>
+
+                <div class="grid grid-cols-2">
+                    <div class="form-group">
+                        <label class="form-label" for="systolic_bp">Systolic BP (mmHg)</label>
+                        <input type="number" name="systolic_bp" id="systolic_bp" class="form-control" value="{{ latest_profile.systolic_bp|default:'125' }}" required>
+                    </div>
+
+                    <div class="form-group">
+                        <label class="form-label" for="diastolic_bp">Diastolic BP (mmHg)</label>
+                        <input type="number" name="diastolic_bp" id="diastolic_bp" class="form-control" value="{{ latest_profile.diastolic_bp|default:'82' }}" required>
+                    </div>
+                </div>
+
+                <div class="grid grid-cols-2">
+                    <div class="form-group">
+                        <label class="form-label" for="blood_glucose">Fasting Blood Glucose (mg/dL)</label>
+                        <input type="number" step="0.1" name="blood_glucose" id="blood_glucose" class="form-control" value="{{ latest_profile.blood_glucose|default:'98' }}" required>
+                    </div>
+
+                    <div class="form-group">
+                        <label class="form-label" for="cholesterol">Total Cholesterol (mg/dL)</label>
+                        <input type="number" step="0.1" name="cholesterol" id="cholesterol" class="form-control" value="{{ latest_profile.cholesterol|default:'195' }}" required>
+                    </div>
+                </div>
+
+                <div class="grid grid-cols-2">
+                    <div class="form-group">
+                        <label class="form-label" for="height_cm">Height (cm)</label>
+                        <input type="number" step="0.1" name="height_cm" id="height_cm" class="form-control" value="{{ latest_profile.height_cm|default:'175' }}" required>
+                    </div>
+
+                    <div class="form-group">
+                        <label class="form-label" for="weight_kg">Weight (kg)</label>
+                        <input type="number" step="0.1" name="weight_kg" id="weight_kg" class="form-control" value="{{ latest_profile.weight_kg|default:'75' }}" required>
+                    </div>
+                </div>
+
+                <div class="grid grid-cols-3">
+                    <div class="form-group">
+                        <label class="form-label" for="exercise_frequency">Exercise (days/wk)</label>
+                        <input type="number" name="exercise_frequency" id="exercise_frequency" class="form-control" value="{{ latest_profile.exercise_frequency_days|default:'3' }}" min="0" max="7">
+                    </div>
+
+                    <div class="form-group">
+                        <label class="form-label" for="smoking">Smoking</label>
+                        <select name="smoking" id="smoking" class="form-select">
+                            <option value="never" {% if latest_profile.smoking_status == 'never' %}selected{% endif %}>Never</option>
+                            <option value="occasional" {% if latest_profile.smoking_status == 'occasional' %}selected{% endif %}>Occasional</option>
+                            <option value="regular" {% if latest_profile.smoking_status == 'regular' or latest_profile.smoking_status == 'heavy' %}selected{% endif %}>Regular / Heavy</option>
+                        </select>
+                    </div>
+
+                    <div class="form-group">
+                        <label class="form-label" for="family_history">Family History</label>
+                        <select name="family_history" id="family_history" class="form-select">
+                            <option value="no">No History</option>
+                            <option value="yes">Yes (Present)</option>
+                        </select>
+                    </div>
+                </div>
+
+                <button type="submit" class="btn btn-primary btn-block btn-lg" style="margin-top: 1rem;">
+                    🚀 Run Machine Learning Risk Assessment
+                </button>
+            </form>
+        </div>
+
+        <!-- Real-Time AI Prediction Output -->
+        <div class="card">
+            <div class="card-header">
+                <h3 class="card-title">🧠 AI Prediction Analysis & Interpretation</h3>
+            </div>
+
+            {% if result %}
+                <div style="text-align: center; padding: 1.5rem 0;">
+                    <div style="font-size: 0.85rem; font-weight: 700; color: var(--text-muted); text-transform: uppercase;">
+                        Calculated Disease Risk Probability
+                    </div>
+                    <div style="font-size: 3.5rem; font-weight: 800; color: {% if result.risk_level == 'HIGH' %}var(--danger){% elif result.risk_level == 'MODERATE' %}var(--warning){% else %}var(--success){% endif %}; line-height: 1.1; margin: 0.5rem 0;">
+                        {{ result.probability_pct }}%
+                    </div>
+                    <div>
+                        <span class="badge badge-{{ result.badge_color }}" style="font-size: 1.1rem; padding: 0.5rem 1.5rem;">
+                            {{ result.risk_level }} RISK
+                        </span>
+                    </div>
+                </div>
+
+                <div style="padding: 1rem; background: #f8fafc; border-radius: var(--radius-md); margin-bottom: 1rem;">
+                    <strong>Clinical Summary:</strong> {{ result.clinical_summary }}
+                </div>
+
+                {% if result.contributing_factors %}
+                    <div style="margin-bottom: 1rem;">
+                        <div style="font-weight: 700; font-size: 0.9rem; color: var(--text-main); margin-bottom: 0.5rem;">
+                            ⚠️ Primary Contributing Risk Factors:
+                        </div>
+                        <ul style="list-style-type: none; padding: 0; display: flex; flex-direction: column; gap: 0.35rem;">
+                            {% for factor in result.contributing_factors %}
+                                <li style="font-size: 0.88rem; color: #991b1b; background: #fef2f2; padding: 0.4rem 0.75rem; border-radius: var(--radius-sm);">
+                                    &bull; {{ factor }}
+                                </li>
+                            {% endfor %}
+                        </ul>
+                    </div>
+                {% endif %}
+
+                <!-- AI Disclaimer Box -->
+                <div style="background: #fffbeb; border: 1px dashed #fcd34d; border-radius: var(--radius-md); padding: 0.85rem; font-size: 0.8rem; color: #92400e; line-height: 1.4;">
+                    {{ result.disclaimer }}
+                </div>
+
+                <div style="display: flex; gap: 0.75rem; margin-top: 1.25rem;">
+                    <a href="/recommendations/" class="btn btn-secondary btn-sm" style="flex: 1;">
+                        💡 View Recommendations
+                    </a>
+                    <a href="/appointments/book/" class="btn btn-outline btn-sm" style="flex: 1;">
+                        📅 Book Consultation
+                    </a>
+                </div>
+            {% else %}
+                <div style="text-align: center; padding: 4rem 1rem; color: var(--text-muted);">
+                    <div style="font-size: 3.5rem; margin-bottom: 0.5rem;">🧠</div>
+                    <h4>No Assessment Generated Yet</h4>
+                    <p>Review the physiological parameters on the left and click "Run Machine Learning Risk Assessment" to evaluate your health profile.</p>
+                </div>
+            {% endif %}
+        </div>
+    </div>
+</div>
+{% endblock %}

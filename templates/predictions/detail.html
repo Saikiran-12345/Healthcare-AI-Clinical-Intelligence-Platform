@@ -1,0 +1,77 @@
+{% extends 'base.html' %}
+
+{% block title %}Assessment Report - {{ prediction.disease_type }}{% endblock %}
+{% block page_title %}Clinical Prediction Summary & Report{% endblock %}
+
+{% block content %}
+<div style="max-width: 800px; margin: 0 auto;">
+    <div class="card" style="padding: 2.25rem;">
+        <div class="card-header" style="margin-bottom: 1.5rem;">
+            <div>
+                <h3 class="card-title">🤖 {{ prediction.disease_type|title }} Risk Assessment Report</h3>
+                <p class="card-subtitle">Generated on {{ prediction.created_at|slice:":16" }} using {{ prediction.algorithm_used }}</p>
+            </div>
+            <a href="/predictions/history/" class="btn btn-outline btn-sm">&larr; Back to History</a>
+        </div>
+
+        <div style="text-align: center; padding: 2rem; background: #f8fafc; border-radius: var(--radius-lg); margin-bottom: 1.5rem;">
+            <div style="font-size: 0.85rem; font-weight: 700; color: var(--text-muted); text-transform: uppercase;">
+                Estimated Risk Probability
+            </div>
+            <div style="font-size: 4rem; font-weight: 800; color: {% if prediction.risk_level == 'HIGH' %}var(--danger){% elif prediction.risk_level == 'MODERATE' %}var(--warning){% else %}var(--success){% endif %}; margin: 0.5rem 0;">
+                {{ prediction.probability_pct }}%
+            </div>
+            <div>
+                <span class="badge badge-{{ prediction.badge_color }}" style="font-size: 1.2rem; padding: 0.5rem 1.75rem;">
+                    {{ prediction.risk_level }} RISK
+                </span>
+            </div>
+            <p style="font-size: 1rem; color: var(--text-main); margin-top: 1rem; max-width: 500px; margin-left: auto; margin-right: auto;">
+                {{ prediction.clinical_summary }}
+            </p>
+        </div>
+
+        {% if prediction.contributing_factors %}
+            <div style="margin-bottom: 1.5rem;">
+                <h4 style="font-size: 1rem; font-weight: 700; color: var(--text-main); margin-bottom: 0.75rem;">
+                    Key Contributing Biomarkers:
+                </h4>
+                <ul style="list-style: none; padding: 0; display: flex; flex-direction: column; gap: 0.5rem;">
+                    {% for factor in prediction.contributing_factors %}
+                        <li style="background: #fef2f2; border-left: 4px solid var(--danger); padding: 0.6rem 1rem; border-radius: var(--radius-sm); font-size: 0.9rem; color: #991b1b;">
+                            ⚠️ {{ factor }}
+                        </li>
+                    {% endfor %}
+                </ul>
+            </div>
+        {% endif %}
+
+        <!-- Input Parameters Grid -->
+        <h4 style="font-size: 1rem; font-weight: 700; color: var(--text-main); margin-bottom: 0.75rem;">
+            Recorded Clinical Input Parameters:
+        </h4>
+        <div class="grid grid-cols-3" style="margin-bottom: 1.5rem;">
+            {% for k, v in prediction.inputs.items %}
+                <div style="padding: 0.6rem 0.85rem; background: #f8fafc; border: 1px solid var(--border-color); border-radius: var(--radius-sm); font-size: 0.85rem;">
+                    <div style="color: var(--text-muted); font-size: 0.75rem; text-transform: capitalize;">{{ k|cut:'_' }}</div>
+                    <strong>{{ v|default:'--' }}</strong>
+                </div>
+            {% endfor %}
+        </div>
+
+        <!-- Disclaimer -->
+        <div style="background: #fffbeb; border: 1px dashed #fcd34d; border-radius: var(--radius-md); padding: 1rem; font-size: 0.85rem; color: #92400e; line-height: 1.5; margin-bottom: 1.5rem;">
+            {{ prediction.disclaimer }}
+        </div>
+
+        <div style="display: flex; justify-content: space-between; align-items: center;">
+            <a href="/predictions/assess/?disease={{ prediction.disease_type }}" class="btn btn-outline">
+                Re-run Assessment
+            </a>
+            <a href="/appointments/book/" class="btn btn-primary">
+                Schedule Doctor Consultation
+            </a>
+        </div>
+    </div>
+</div>
+{% endblock %}

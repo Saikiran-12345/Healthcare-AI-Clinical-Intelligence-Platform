@@ -1,0 +1,54 @@
+{% extends 'base.html' %}
+
+{% block title %}Doctor Profile - HealthAI{% endblock %}
+{% block page_title %}Doctor Clinical Profile & Practice Hours{% endblock %}
+
+{% block content %}
+<div style="max-width: 750px; margin: 0 auto;">
+    <div class="card" style="padding: 2.25rem;">
+        <div class="card-header" style="margin-bottom: 1.5rem;">
+            <h3 class="card-title">👨‍⚕️ Clinical Practice & Specialty Details</h3>
+        </div>
+
+        <form method="post" action="">
+            {% csrf_token %}
+
+            <div class="grid grid-cols-2">
+                <div class="form-group">
+                    <label class="form-label" for="{{ form.specialization.id_for_label }}">{{ form.specialization.label }}</label>
+                    {{ form.specialization }}
+                </div>
+
+                <div class="form-group">
+                    <label class="form-label" for="{{ form.department.id_for_label }}">{{ form.department.label }}</label>
+                    {{ form.department }}
+                </div>
+            </div>
+
+            <div class="grid grid-cols-2">
+                <div class="form-group">
+                    <label class="form-label" for="{{ form.license_number.id_for_label }}">{{ form.license_number.label }}</label>
+                    {{ form.license_number }}
+                </div>
+
+                <div class="form-group">
+                    <label class="form-label" for="{{ form.consultation_hours.id_for_label }}">{{ form.consultation_hours.label }}</label>
+                    {{ form.consultation_hours }}
+                </div>
+            </div>
+
+            <div class="form-group" style="margin-top: 1rem;">
+                <label style="display: flex; align-items: center; gap: 0.6rem; cursor: pointer; font-weight: 600;">
+                    {{ form.is_available }} {{ form.is_available.label }}
+                </label>
+            </div>
+
+            <div style="display: flex; justify-content: flex-end; margin-top: 2rem;">
+                <button type="submit" class="btn btn-primary">
+                    Update Clinical Profile
+                </button>
+            </div>
+        </form>
+    </div>
+</div>
+{% endblock %}

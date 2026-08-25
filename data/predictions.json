@@ -1,0 +1,28 @@
+[
+  {
+    "patient_id": "anonymous",
+    "disease_type": "diabetes",
+    "disease_key": "diabetes",
+    "probability_pct": 59.3,
+    "risk_level": "MODERATE",
+    "badge_color": "amber",
+    "clinical_summary": "Moderately elevated risk factors identified. Proactive lifestyle modifications advised.",
+    "contributing_factors": [],
+    "algorithm_used": "RandomForestClassifier",
+    "inputs": {
+      "age": 25,
+      "bmi": 21.0,
+      "glucose": 85.0,
+      "systolic_bp": 115,
+      "diastolic_bp": 75,
+      "exercise_frequency": 5,
+      "family_history": "no",
+      "smoking": 0,
+      "cholesterol": 160.0
+    },
+    "disclaimer": "DISCLAIMER: This machine learning health risk assessment is generated locally for educational and clinical screening purposes only. It is NOT a medical diagnosis. Please consult a qualified physician or healthcare professional for clinical evaluation and treatment plans.",
+    "created_at": "2026-08-25T09:58:07.636784+00:00",
+    "id": "ec96c709-f0b0-4c9e-852c-d0493e2fe1dc",
+    "updated_at": "2026-08-25T09:58:07.637815+00:00"
+  }
+]

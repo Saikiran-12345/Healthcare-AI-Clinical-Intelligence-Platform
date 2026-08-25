@@ -1,0 +1,74 @@
+{% extends 'base.html' %}
+
+{% block title %}Prediction History - HealthAI{% endblock %}
+{% block page_title %}Chronological AI Risk Prediction History{% endblock %}
+
+{% block content %}
+<div class="grid grid-cols-1" style="gap: 1.5rem;">
+    <!-- Header Card -->
+    <div class="card" style="display: flex; justify-content: space-between; align-items: center; padding: 1.25rem;">
+        <div>
+            <h3 style="font-size: 1.2rem; font-weight: 700; margin: 0;">Machine Learning Health Risk Assessments</h3>
+            <p style="color: var(--text-muted); font-size: 0.85rem; margin: 0;">Longitudinal log of disease probability models and clinical evaluations</p>
+        </div>
+        <a href="/predictions/assess/" class="btn btn-primary">
+            + Run New Risk Assessment
+        </a>
+    </div>
+
+    <!-- History Table Card -->
+    <div class="card">
+        {% if predictions %}
+            <div class="table-responsive">
+                <table class="table">
+                    <thead>
+                        <tr>
+                            <th>Disease Domain</th>
+                            <th>Risk Level</th>
+                            <th>Probability</th>
+                            <th>Algorithm Model</th>
+                            <th>Clinical Summary</th>
+                            <th>Date & Time</th>
+                            <th>Action</th>
+                        </tr>
+                    </thead>
+                    <tbody>
+                        {% for pred in predictions %}
+                            <tr>
+                                <td><strong>{{ pred.disease_type|title }}</strong></td>
+                                <td>
+                                    <span class="badge {% if pred.risk_level == 'HIGH' %}badge-high{% elif pred.risk_level == 'MODERATE' %}badge-moderate{% else %}badge-low{% endif %}">
+                                        {{ pred.risk_level }}
+                                    </span>
+                                </td>
+                                <td>
+                                    <strong style="color: {% if pred.risk_level == 'HIGH' %}var(--danger){% elif pred.risk_level == 'MODERATE' %}var(--warning){% else %}var(--success){% endif %}; font-size: 1rem;">
+                                        {{ pred.probability_pct }}%
+                                    </strong>
+                                </td>
+                                <td>{{ pred.algorithm_used|default:'Scikit-Learn ML' }}</td>
+                                <td style="max-width: 250px; font-size: 0.85rem; color: var(--text-muted);">
+                                    {{ pred.clinical_summary|truncatewords:10 }}
+                                </td>
+                                <td style="font-size: 0.85rem;">{{ pred.created_at|slice:":16" }}</td>
+                                <td>
+                                    <a href="/predictions/detail/{{ pred.id }}/" class="btn btn-outline btn-sm">
+                                        View Report
+                                    </a>
+                                </td>
+                            </tr>
+                        {% endfor %}
+                    </tbody>
+                </table>
+            </div>
+        {% else %}
+            <div style="text-align: center; padding: 4rem 1rem; color: var(--text-muted);">
+                <div style="font-size: 3.5rem; margin-bottom: 0.5rem;">🧠</div>
+                <h4>No Prediction History Found</h4>
+                <p>Run your first machine learning health risk assessment to populate your longitudinal history.</p>
+                <a href="/predictions/assess/" class="btn btn-primary" style="margin-top: 1rem;">Run Assessment</a>
+            </div>
+        {% endif %}
+    </div>
+</div>
+{% endblock %}

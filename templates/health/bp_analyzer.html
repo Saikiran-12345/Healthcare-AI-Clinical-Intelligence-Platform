@@ -1,0 +1,75 @@
+{% extends 'base.html' %}
+
+{% block title %}Blood Pressure Analyzer - HealthAI{% endblock %}
+{% block page_title %}AHA/ACC 2017 Blood Pressure & MAP Analyzer{% endblock %}
+
+{% block content %}
+<div class="grid grid-cols-2">
+    <!-- Input Form -->
+    <div class="card">
+        <div class="card-header">
+            <h3 class="card-title">❤️ Enter Blood Pressure Readings</h3>
+        </div>
+
+        <form method="get" action="">
+            <div class="form-group">
+                <label class="form-label" for="systolic">Systolic Pressure (mmHg) - Upper Number</label>
+                <input type="number" name="systolic" id="systolic" class="form-control" value="{{ systolic }}" min="60" max="260" required>
+                <div class="form-help">Normal reading: Under 120 mmHg</div>
+            </div>
+
+            <div class="form-group">
+                <label class="form-label" for="diastolic">Diastolic Pressure (mmHg) - Lower Number</label>
+                <input type="number" name="diastolic" id="diastolic" class="form-control" value="{{ diastolic }}" min="40" max="160" required>
+                <div class="form-help">Normal reading: Under 80 mmHg</div>
+            </div>
+
+            <button type="submit" class="btn btn-primary btn-block" style="margin-top: 1.5rem;">
+                Evaluate Blood Pressure & MAP
+            </button>
+        </form>
+    </div>
+
+    <!-- Results Display -->
+    <div class="card">
+        <div class="card-header">
+            <h3 class="card-title">🩺 Clinical Staging & Hemodynamics</h3>
+        </div>
+
+        {% if result %}
+            <div style="text-align: center; padding: 1.5rem 0;">
+                <div style="font-size: 2.75rem; font-weight: 800; color: var(--text-main);">
+                    {{ result.systolic }} / {{ result.diastolic }} <span style="font-size: 1.1rem; font-weight: 600; color: var(--text-muted);">mmHg</span>
+                </div>
+                <div style="margin-top: 0.5rem;">
+                    <span class="badge badge-{{ result.badge_color }}" style="font-size: 1rem; padding: 0.4rem 1rem;">
+                        {{ result.category }}
+                    </span>
+                </div>
+                <p style="color: var(--text-muted); font-size: 0.9rem; margin-top: 1rem;">
+                    {{ result.guidance }}
+                </p>
+            </div>
+
+            <div class="grid grid-cols-2" style="gap: 1rem; margin-top: 1rem;">
+                <div style="background: #f8fafc; border: 1px solid var(--border-color); border-radius: var(--radius-md); padding: 1rem; text-align: center;">
+                    <div style="font-size: 0.78rem; font-weight: 700; color: var(--text-muted); text-transform: uppercase;">Mean Arterial Pressure (MAP)</div>
+                    <div style="font-size: 1.6rem; font-weight: 800; color: var(--primary);">{{ result.mean_arterial_pressure }} mmHg</div>
+                    <div style="font-size: 0.75rem; color: var(--text-muted);">Normal perfusion range: 70-100 mmHg</div>
+                </div>
+
+                <div style="background: #f8fafc; border: 1px solid var(--border-color); border-radius: var(--radius-md); padding: 1rem; text-align: center;">
+                    <div style="font-size: 0.78rem; font-weight: 700; color: var(--text-muted); text-transform: uppercase;">Pulse Pressure</div>
+                    <div style="font-size: 1.6rem; font-weight: 800; color: var(--secondary);">{{ result.pulse_pressure }} mmHg</div>
+                    <div style="font-size: 0.75rem; color: var(--text-muted);">Normal range: 30-50 mmHg</div>
+                </div>
+            </div>
+        {% else %}
+            <div style="text-align: center; padding: 3rem; color: var(--text-muted);">
+                <div style="font-size: 3rem; margin-bottom: 0.5rem;">❤️</div>
+                <p>Enter your systolic and diastolic readings on the left to view clinical staging.</p>
+            </div>
+        {% endif %}
+    </div>
+</div>
+{% endblock %}

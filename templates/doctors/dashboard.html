@@ -1,0 +1,171 @@
+{% extends 'base.html' %}
+
+{% block title %}Doctor Dashboard - HealthAI{% endblock %}
+{% block page_title %}Doctor Clinical Operations & Patient Triage{% endblock %}
+
+{% block content %}
+<div class="grid grid-cols-1" style="gap: 1.5rem;">
+    <!-- Welcome Header Card -->
+    <div class="card" style="background: linear-gradient(135deg, #0d9488 0%, #0f766e 100%); color: white;">
+        <div style="display: flex; justify-content: space-between; align-items: center; flex-wrap: wrap; gap: 1rem;">
+            <div>
+                <h2 style="font-size: 1.5rem; font-weight: 800; margin-bottom: 0.25rem;">
+                    Welcome, {{ doctor.full_name }}
+                </h2>
+                <p style="opacity: 0.9; font-size: 0.95rem;">
+                    {{ doctor.specialization }} | {{ doctor.department }} &bull; License: {{ doctor.license_number }}
+                </p>
+            </div>
+            <div style="display: flex; gap: 0.75rem;">
+                <a href="/doctors/patients/" class="btn btn-primary btn-sm" style="background: white; color: #0d9488; font-weight: 700;">
+                    👥 View Patient Roster
+                </a>
+                <a href="/doctors/risk-monitoring/" class="btn btn-outline btn-sm" style="color: white; border-color: rgba(255,255,255,0.4);">
+                    ⚠️ High-Risk Surveillance
+                </a>
+            </div>
+        </div>
+    </div>
+
+    <!-- Stats Row -->
+    <div class="grid grid-cols-4">
+        <div class="card stat-card">
+            <div class="stat-icon blue">👥</div>
+            <div class="stat-info">
+                <div class="stat-value">{{ total_patients }}</div>
+                <div class="stat-label">Active Patients</div>
+            </div>
+        </div>
+
+        <div class="card stat-card">
+            <div class="stat-icon red">⚠️</div>
+            <div class="stat-info">
+                <div class="stat-value">{{ high_risk_count }}</div>
+                <div class="stat-label">High-Risk Cases</div>
+            </div>
+        </div>
+
+        <div class="card stat-card">
+            <div class="stat-icon amber">📅</div>
+            <div class="stat-info">
+                <div class="stat-value">{{ pending_appointments_count }}</div>
+                <div class="stat-label">Pending Requests</div>
+            </div>
+        </div>
+
+        <div class="card stat-card">
+            <div class="stat-icon green">🧠</div>
+            <div class="stat-info">
+                <div class="stat-value">{{ recent_predictions|length }}</div>
+                <div class="stat-label">Recent ML Runs</div>
+            </div>
+        </div>
+    </div>
+
+    <!-- High Risk Surveillance Table & Risk Distribution -->
+    <div class="grid grid-cols-3">
+        <!-- High Risk Alerts (2 cols) -->
+        <div class="card" style="grid-column: span 2;">
+            <div class="card-header">
+                <h3 class="card-title">⚠️ Priority High-Risk Patients</h3>
+                <a href="/doctors/risk-monitoring/" class="btn btn-outline btn-sm">All High Risk &rarr;</a>
+            </div>
+
+            {% if high_risk_cases %}
+                <div class="table-responsive">
+                    <table class="table">
+                        <thead>
+                            <tr>
+                                <th>Patient</th>
+                                <th>Flagged Disease</th>
+                                <th>Probability</th>
+                                <th>Latest Vitals (BP / Glucose)</th>
+                                <th>Action</th>
+                            </tr>
+                        </thead>
+                        <tbody>
+                            {% for item in high_risk_cases %}
+                                <tr>
+                                    <td>
+                                        <strong>{{ item.patient.full_name }}</strong>
+                                        <div style="font-size: 0.78rem; color: var(--text-muted);">{{ item.patient.gender|title }}, {{ item.latest_profile.age|default:'--' }} yrs</div>
+                                    </td>
+                                    <td>
+                                        <span class="badge badge-high">{{ item.flagged_prediction.disease_type|title }}</span>
+                                    </td>
+                                    <td>
+                                        <strong style="color: var(--danger);">{{ item.flagged_prediction.probability_pct }}%</strong>
+                                    </td>
+                                    <td>
+                                        {% if item.latest_profile %}
+                                            {{ item.latest_profile.systolic_bp }}/{{ item.latest_profile.diastolic_bp }} mmHg | {{ item.latest_profile.blood_glucose }} mg/dL
+                                        {% else %}
+                                            --
+                                        {% endif %}
+                                    </td>
+                                    <td>
+                                        <a href="/doctors/patients/{{ item.patient.id }}/" class="btn btn-primary btn-sm">
+                                            Open Chart
+                                        </a>
+                                    </td>
+                                </tr>
+                            {% endfor %}
+                        </tbody>
+                    </table>
+                </div>
+            {% else %}
+                <div style="text-align: center; padding: 2.5rem; color: var(--text-muted);">
+                    <div style="font-size: 2.5rem; margin-bottom: 0.5rem;">✅</div>
+                    <p>No immediate critical high-risk patient flags detected.</p>
+                </div>
+            {% endif %}
+        </div>
+
+        <!-- Risk Distribution Chart Card -->
+        <div class="card">
+            <div class="card-header">
+                <h3 class="card-title">📊 Risk Tier Breakdown</h3>
+            </div>
+            <div style="position: relative; height: 220px; width: 100%;">
+                <canvas id="riskDistChart"></canvas>
+            </div>
+            <div style="display: flex; justify-content: space-around; margin-top: 1rem; font-size: 0.85rem; text-align: center;">
+                <div><span style="color: #10b981; font-weight: 700;">LOW:</span> {{ risk_distribution.LOW }}</div>
+                <div><span style="color: #f59e0b; font-weight: 700;">MOD:</span> {{ risk_distribution.MODERATE }}</div>
+                <div><span style="color: #ef4444; font-weight: 700;">HIGH:</span> {{ risk_distribution.HIGH }}</div>
+            </div>
+        </div>
+    </div>
+</div>
+
+<script>
+    document.addEventListener('DOMContentLoaded', () => {
+        const ctx = document.getElementById('riskDistChart');
+        if (ctx) {
+            new Chart(ctx, {
+                type: 'doughnut',
+                data: {
+                    labels: ['Low Risk', 'Moderate Risk', 'High Risk'],
+                    datasets: [{
+                        data: [
+                            {{ risk_distribution.LOW }},
+                            {{ risk_distribution.MODERATE }},
+                            {{ risk_distribution.HIGH }}
+                        ],
+                        backgroundColor: ['#10b981', '#f59e0b', '#ef4444'],
+                        borderWidth: 2,
+                        borderColor: '#ffffff',
+                    }]
+                },
+                options: {
+                    responsive: true,
+                    maintainAspectRatio: false,
+                    plugins: {
+                        legend: { position: 'bottom' }
+                    }
+                }
+            });
+        }
+    });
+</script>
+{% endblock %}

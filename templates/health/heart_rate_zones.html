@@ -1,0 +1,84 @@
+{% extends 'base.html' %}
+
+{% block title %}Heart Rate Zones - HealthAI{% endblock %}
+{% block page_title %}Resting Heart Rate & Aerobic Exercise Zones{% endblock %}
+
+{% block content %}
+<div class="grid grid-cols-2">
+    <!-- Input Form -->
+    <div class="card">
+        <div class="card-header">
+            <h3 class="card-title">💓 Enter Cardiovascular Metrics</h3>
+        </div>
+
+        <form method="get" action="">
+            <div class="form-group">
+                <label class="form-label" for="resting_hr">Resting Heart Rate (beats per minute / bpm)</label>
+                <input type="number" name="resting_hr" id="resting_hr" class="form-control" value="{{ resting_hr }}" min="30" max="220" required>
+                <div class="form-help">Measure first thing in the morning before activity.</div>
+            </div>
+
+            <div class="form-group">
+                <label class="form-label" for="age">Current Age (Years)</label>
+                <input type="number" name="age" id="age" class="form-control" value="{{ age }}" min="1" max="120" required>
+            </div>
+
+            <button type="submit" class="btn btn-primary btn-block" style="margin-top: 1.5rem;">
+                Calculate Target Training Zones
+            </button>
+        </form>
+    </div>
+
+    <!-- Results Display -->
+    <div class="card">
+        <div class="card-header">
+            <h3 class="card-title">🏃 Target Heart Rate Training Zones</h3>
+        </div>
+
+        {% if result %}
+            <div style="text-align: center; padding: 1rem 0; border-bottom: 1px solid var(--border-color); margin-bottom: 1.25rem;">
+                <div style="font-size: 2.5rem; font-weight: 800; color: var(--primary);">
+                    {{ result.resting_heart_rate }} <span style="font-size: 1rem; color: var(--text-muted);">bpm</span>
+                </div>
+                <div style="font-weight: 700; color: var(--text-main); margin-top: 0.25rem;">{{ result.category }}</div>
+                <p style="font-size: 0.85rem; color: var(--text-muted); margin-top: 0.25rem;">{{ result.clinical_note }}</p>
+                <div style="font-size: 0.85rem; margin-top: 0.5rem;">
+                    <strong>Estimated Maximum Heart Rate (HRmax):</strong> {{ result.max_heart_rate }} bpm
+                </div>
+            </div>
+
+            <div style="display: flex; flex-direction: column; gap: 0.6rem; font-size: 0.875rem;">
+                <div style="display: flex; justify-content: space-between; padding: 0.6rem 0.85rem; background: #eff6ff; border-radius: var(--radius-sm); border-left: 4px solid #3b82f6;">
+                    <span>🟢 <strong>Zone 1 (Warm Up):</strong> 50% - 60%</span>
+                    <strong>{{ result.training_zones.warm_up_zone.0 }} - {{ result.training_zones.warm_up_zone.1 }} bpm</strong>
+                </div>
+
+                <div style="display: flex; justify-content: space-between; padding: 0.6rem 0.85rem; background: #ecfdf5; border-radius: var(--radius-sm); border-left: 4px solid #10b981;">
+                    <span>🟡 <strong>Zone 2 (Fat Burn / Aerobic Base):</strong> 60% - 70%</span>
+                    <strong>{{ result.training_zones.fat_burn_zone.0 }} - {{ result.training_zones.fat_burn_zone.1 }} bpm</strong>
+                </div>
+
+                <div style="display: flex; justify-content: space-between; padding: 0.6rem 0.85rem; background: #fefce8; border-radius: var(--radius-sm); border-left: 4px solid #eab308;">
+                    <span>🟠 <strong>Zone 3 (Aerobic Fitness):</strong> 70% - 80%</span>
+                    <strong>{{ result.training_zones.aerobic_zone.0 }} - {{ result.training_zones.aerobic_zone.1 }} bpm</strong>
+                </div>
+
+                <div style="display: flex; justify-content: space-between; padding: 0.6rem 0.85rem; background: #fff7ed; border-radius: var(--radius-sm); border-left: 4px solid #f97316;">
+                    <span>🔴 <strong>Zone 4 (Anaerobic / Lactate Threshold):</strong> 80% - 90%</span>
+                    <strong>{{ result.training_zones.anaerobic_zone.0 }} - {{ result.training_zones.anaerobic_zone.1 }} bpm</strong>
+                </div>
+
+                <div style="display: flex; justify-content: space-between; padding: 0.6rem 0.85rem; background: #fef2f2; border-radius: var(--radius-sm); border-left: 4px solid #ef4444;">
+                    <span>🟣 <strong>Zone 5 (VO2 Max / Peak Intensity):</strong> 90% - 100%</span>
+                    <strong>{{ result.training_zones.vo2_max_zone.0 }} - {{ result.training_zones.vo2_max_zone.1 }} bpm</strong>
+                </div>
+            </div>
+        {% else %}
+            <div style="text-align: center; padding: 3rem; color: var(--text-muted);">
+                <div style="font-size: 3rem; margin-bottom: 0.5rem;">💓</div>
+                <p>Enter your resting heart rate and age to compute exercise training zones.</p>
+            </div>
+        {% endif %}
+    </div>
+</div>
+{% endblock %}

@@ -1,0 +1,122 @@
+{% extends 'base.html' %}
+
+{% block title %}BMR & TDEE Calorie Calculator - HealthAI{% endblock %}
+{% block page_title %}Basal Metabolic Rate (BMR) & Daily Calorie Estimation{% endblock %}
+
+{% block content %}
+<div class="grid grid-cols-2">
+    <!-- Input Form -->
+    <div class="card">
+        <div class="card-header">
+            <h3 class="card-title">🔥 Biometrics & Physical Activity</h3>
+        </div>
+
+        <form method="get" action="">
+            <div class="grid grid-cols-2">
+                <div class="form-group">
+                    <label class="form-label" for="age">Age (Years)</label>
+                    <input type="number" name="age" id="age" class="form-control" value="{{ age }}" required>
+                </div>
+
+                <div class="form-group">
+                    <label class="form-label" for="gender">Biological Sex</label>
+                    <select name="gender" id="gender" class="form-select">
+                        <option value="male" {% if gender == 'male' %}selected{% endif %}>Male</option>
+                        <option value="female" {% if gender == 'female' %}selected{% endif %}>Female</option>
+                    </select>
+                </div>
+            </div>
+
+            <div class="grid grid-cols-2">
+                <div class="form-group">
+                    <label class="form-label" for="height">Height (cm)</label>
+                    <input type="number" step="0.1" name="height" id="height" class="form-control" value="{{ height }}" required>
+                </div>
+
+                <div class="form-group">
+                    <label class="form-label" for="weight">Weight (kg)</label>
+                    <input type="number" step="0.1" name="weight" id="weight" class="form-control" value="{{ weight }}" required>
+                </div>
+            </div>
+
+            <div class="form-group">
+                <label class="form-label" for="activity">Weekly Physical Activity Level</label>
+                <select name="activity" id="activity" class="form-select">
+                    <option value="sedentary" {% if activity == 'sedentary' %}selected{% endif %}>Sedentary (Little or no exercise)</option>
+                    <option value="light" {% if activity == 'light' %}selected{% endif %}>Lightly Active (Exercise 1-3 days/week)</option>
+                    <option value="moderate" {% if activity == 'moderate' %}selected{% endif %}>Moderately Active (Exercise 3-5 days/week)</option>
+                    <option value="active" {% if activity == 'active' %}selected{% endif %}>Very Active (Hard exercise 6-7 days/week)</option>
+                </select>
+            </div>
+
+            <button type="submit" class="btn btn-primary btn-block" style="margin-top: 1.5rem;">
+                Calculate BMR & TDEE
+            </button>
+        </form>
+    </div>
+
+    <!-- Results Display -->
+    <div class="card">
+        <div class="card-header">
+            <h3 class="card-title">⚡ Metabolic Energy Estimates</h3>
+        </div>
+
+        {% if result %}
+            <div class="grid grid-cols-2" style="gap: 1rem; margin-bottom: 1.5rem;">
+                <div style="background: #f0fdf4; border: 1px solid #bbf7d0; border-radius: var(--radius-md); padding: 1.25rem; text-align: center;">
+                    <div style="font-size: 0.8rem; font-weight: 700; color: #166534; text-transform: uppercase;">Basal Metabolic Rate</div>
+                    <div style="font-size: 2rem; font-weight: 800; color: #15803d;">{{ result.bmr.bmr_calories }}</div>
+                    <div style="font-size: 0.75rem; color: #166534;">Calories/day at complete rest</div>
+                </div>
+
+                <div style="background: #eff6ff; border: 1px solid #bfdbfe; border-radius: var(--radius-md); padding: 1.25rem; text-align: center;">
+                    <div style="font-size: 0.8rem; font-weight: 700; color: #1e40af; text-transform: uppercase;">Daily Expenditure (TDEE)</div>
+                    <div style="font-size: 2rem; font-weight: 800; color: #1d4ed8;">{{ result.tdee.tdee_maintenance }}</div>
+                    <div style="font-size: 0.75rem; color: #1e40af;">Calories/day for maintenance</div>
+                </div>
+            </div>
+
+            <h4 style="font-size: 0.95rem; font-weight: 700; color: var(--text-main); margin-bottom: 0.75rem;">
+                🎯 Calorie Targets for Health Goals
+            </h4>
+            <div style="display: flex; flex-direction: column; gap: 0.5rem; font-size: 0.9rem;">
+                <div style="display: flex; justify-content: space-between; padding: 0.6rem; background: #f8fafc; border-radius: var(--radius-sm);">
+                    <span>🔥 Gradual Fat Loss (-500 kcal):</span>
+                    <strong>{{ result.tdee.fat_loss_target }} kcal/day</strong>
+                </div>
+                <div style="display: flex; justify-content: space-between; padding: 0.6rem; background: #f8fafc; border-radius: var(--radius-sm);">
+                    <span>⚖️ Weight Maintenance:</span>
+                    <strong>{{ result.tdee.tdee_maintenance }} kcal/day</strong>
+                </div>
+                <div style="display: flex; justify-content: space-between; padding: 0.6rem; background: #f8fafc; border-radius: var(--radius-sm);">
+                    <span>💪 Lean Muscle Gain (+300 kcal):</span>
+                    <strong>{{ result.tdee.muscle_gain_target }} kcal/day</strong>
+                </div>
+            </div>
+
+            <h4 style="font-size: 0.95rem; font-weight: 700; color: var(--text-main); margin-top: 1.25rem; margin-bottom: 0.5rem;">
+                🥗 Maintenance Macronutrient Breakdown
+            </h4>
+            <div class="grid grid-cols-3" style="text-align: center; font-size: 0.85rem;">
+                <div style="padding: 0.5rem; background: #f1f5f9; border-radius: var(--radius-sm);">
+                    <div style="font-weight: 700; color: var(--primary);">Protein</div>
+                    <div>{{ result.tdee.macros.protein_grams }}g (30%)</div>
+                </div>
+                <div style="padding: 0.5rem; background: #f1f5f9; border-radius: var(--radius-sm);">
+                    <div style="font-weight: 700; color: var(--secondary);">Carbs</div>
+                    <div>{{ result.tdee.macros.carbs_grams }}g (40%)</div>
+                </div>
+                <div style="padding: 0.5rem; background: #f1f5f9; border-radius: var(--radius-sm);">
+                    <div style="font-weight: 700; color: var(--warning);">Fats</div>
+                    <div>{{ result.tdee.macros.fats_grams }}g (30%)</div>
+                </div>
+            </div>
+        {% else %}
+            <div style="text-align: center; padding: 3rem; color: var(--text-muted);">
+                <div style="font-size: 3rem; margin-bottom: 0.5rem;">⚡</div>
+                <p>Enter your details on the left to calculate metabolic metrics.</p>
+            </div>
+        {% endif %}
+    </div>
+</div>
+{% endblock %}

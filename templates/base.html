@@ -1,0 +1,238 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>{% block title %}AI Healthcare Management & Health Risk Prediction{% endblock %}</title>
+    <link rel="stylesheet" href="/static/css/styles.css">
+    <!-- Chart.js for data analytics visualizations -->
+    <script src="https://cdn.jsdelivr.net/npm/chart.js@4.4.1/dist/chart.umd.min.js"></script>
+    {% block extra_head %}{% endblock %}
+</head>
+<body>
+    <div class="app-container">
+        <!-- Sidebar Navigation -->
+        <aside class="app-sidebar" id="appSidebar">
+            <div class="sidebar-header">
+                <div class="brand-icon">⚕</div>
+                <div class="brand-text">
+                    <h1>HealthAI</h1>
+                    <span>Predict & Care</span>
+                </div>
+            </div>
+
+            <ul class="sidebar-menu">
+                <li class="menu-section-title">Navigation</li>
+                <li class="menu-item {% if request.path == '/' %}active{% endif %}">
+                    <a href="/">
+                        <span class="menu-icon">🏠</span>
+                        <span>Home</span>
+                    </a>
+                </li>
+                <li class="menu-item {% if '/health/calculators/' in request.path %}active{% endif %}">
+                    <a href="/health/calculators/">
+                        <span class="menu-icon">🧮</span>
+                        <span>Health Calculators</span>
+                    </a>
+                </li>
+
+                {% if user.is_authenticated %}
+                    {% if user.role == 'patient' %}
+                        <li class="menu-section-title">Patient Portal</li>
+                        <li class="menu-item {% if '/patients/dashboard/' in request.path %}active{% endif %}">
+                            <a href="/patients/dashboard/">
+                                <span class="menu-icon">📊</span>
+                                <span>My Dashboard</span>
+                            </a>
+                        </li>
+                        <li class="menu-item {% if '/patients/profile/' in request.path %}active{% endif %}">
+                            <a href="/patients/profile/">
+                                <span class="menu-icon">👤</span>
+                                <span>Health Profile</span>
+                            </a>
+                        </li>
+                        <li class="menu-item {% if '/predictions/assess/' in request.path %}active{% endif %}">
+                            <a href="/predictions/assess/">
+                                <span class="menu-icon">🧠</span>
+                                <span>AI Risk Assessment</span>
+                            </a>
+                        </li>
+                        <li class="menu-item {% if '/nlp/symptoms/' in request.path %}active{% endif %}">
+                            <a href="/nlp/symptoms/">
+                                <span class="menu-icon">🩺</span>
+                                <span>Symptom Checker</span>
+                            </a>
+                        </li>
+                        <li class="menu-item {% if '/recommendations/' in request.path %}active{% endif %}">
+                            <a href="/recommendations/">
+                                <span class="menu-icon">💡</span>
+                                <span>Recommendations</span>
+                            </a>
+                        </li>
+                        <li class="menu-item {% if '/appointments/my-appointments/' in request.path %}active{% endif %}">
+                            <a href="/appointments/my-appointments/">
+                                <span class="menu-icon">📅</span>
+                                <span>Appointments</span>
+                            </a>
+                        </li>
+                        <li class="menu-item {% if '/notifications/' in request.path %}active{% endif %}">
+                            <a href="/notifications/">
+                                <span class="menu-icon">🔔</span>
+                                <span>Notifications</span>
+                            </a>
+                        </li>
+
+                    {% elif user.role == 'doctor' %}
+                        <li class="menu-section-title">Clinical Doctor Portal</li>
+                        <li class="menu-item {% if '/doctors/dashboard/' in request.path %}active{% endif %}">
+                            <a href="/doctors/dashboard/">
+                                <span class="menu-icon">📊</span>
+                                <span>Clinical Dashboard</span>
+                            </a>
+                        </li>
+                        <li class="menu-item {% if '/doctors/patients/' in request.path %}active{% endif %}">
+                            <a href="/doctors/patients/">
+                                <span class="menu-icon">👥</span>
+                                <span>Patient Roster</span>
+                            </a>
+                        </li>
+                        <li class="menu-item {% if '/doctors/risk-monitoring/' in request.path %}active{% endif %}">
+                            <a href="/doctors/risk-monitoring/">
+                                <span class="menu-icon">⚠️</span>
+                                <span>High-Risk Triage</span>
+                            </a>
+                        </li>
+                        <li class="menu-item {% if '/doctors/appointments/' in request.path %}active{% endif %}">
+                            <a href="/doctors/appointments/">
+                                <span class="menu-icon">📅</span>
+                                <span>Manage Schedule</span>
+                            </a>
+                        </li>
+                        <li class="menu-item {% if '/analytics/clinical/' in request.path %}active{% endif %}">
+                            <a href="/analytics/clinical/">
+                                <span class="menu-icon">📈</span>
+                                <span>Clinical Analytics</span>
+                            </a>
+                        </li>
+
+                    {% elif user.role == 'admin' %}
+                        <li class="menu-section-title">System Administration</li>
+                        <li class="menu-item {% if '/admin-panel/dashboard/' in request.path %}active{% endif %}">
+                            <a href="/admin-panel/dashboard/">
+                                <span class="menu-icon">⚙️</span>
+                                <span>Admin Dashboard</span>
+                            </a>
+                        </li>
+                        <li class="menu-item {% if '/admin-panel/users/' in request.path %}active{% endif %}">
+                            <a href="/admin-panel/users/">
+                                <span class="menu-icon">👥</span>
+                                <span>User Management</span>
+                            </a>
+                        </li>
+                        <li class="menu-item {% if '/admin-panel/models/' in request.path %}active{% endif %}">
+                            <a href="/admin-panel/models/">
+                                <span class="menu-icon">🤖</span>
+                                <span>ML Models & Stats</span>
+                            </a>
+                        </li>
+                        <li class="menu-item {% if '/admin-panel/audit-logs/' in request.path %}active{% endif %}">
+                            <a href="/admin-panel/audit-logs/">
+                                <span class="menu-icon">📜</span>
+                                <span>Audit Trails</span>
+                            </a>
+                        </li>
+                        <li class="menu-item {% if '/analytics/system/' in request.path %}active{% endif %}">
+                            <a href="/analytics/system/">
+                                <span class="menu-icon">📊</span>
+                                <span>System Analytics</span>
+                            </a>
+                        </li>
+                    {% endif %}
+                {% else %}
+                    <li class="menu-section-title">Account</li>
+                    <li class="menu-item {% if '/accounts/login/' in request.path %}active{% endif %}">
+                        <a href="/accounts/login/">
+                            <span class="menu-icon">🔑</span>
+                            <span>Sign In</span>
+                        </a>
+                    </li>
+                    <li class="menu-item {% if '/accounts/register/' in request.path %}active{% endif %}">
+                        <a href="/accounts/register/">
+                            <span class="menu-icon">📝</span>
+                            <span>Register Patient</span>
+                        </a>
+                    </li>
+                {% endif %}
+            </ul>
+
+            <div class="sidebar-footer">
+                {% if user.is_authenticated %}
+                    <div class="user-badge">
+                        <div class="user-avatar">
+                            {{ user.first_name|default:user.username|slice:":1"|upper }}
+                        </div>
+                        <div class="user-details">
+                            <div class="user-name">{{ user.full_name|default:user.username }}</div>
+                            <div class="user-role">{{ user.role }}</div>
+                        </div>
+                    </div>
+                {% else %}
+                    <div style="font-size: 0.78rem; color: #94a3b8; text-align: center;">
+                        Local AI Healthcare Engine v1.0
+                    </div>
+                {% endif %}
+            </div>
+        </aside>
+
+        <!-- Main Content Column -->
+        <main class="app-main">
+            <!-- Top Navbar -->
+            <header class="top-navbar">
+                <div class="nav-left">
+                    <button class="sidebar-toggle-btn" id="sidebarToggle" title="Toggle Navigation">☰</button>
+                    <div class="page-title">
+                        <h2>{% block page_title %}Healthcare AI Portal{% endblock %}</h2>
+                    </div>
+                </div>
+
+                <div class="nav-right">
+                    {% if user.is_authenticated %}
+                        <a href="/notifications/" class="notif-badge-btn" title="Notifications">
+                            🔔
+                            {% if unread_notif_count and unread_notif_count > 0 %}
+                                <span class="notif-counter">{{ unread_notif_count }}</span>
+                            {% endif %}
+                        </a>
+                        <a href="/accounts/profile/" class="nav-link-btn">⚙️ Settings</a>
+                        <a href="/accounts/logout/" class="btn btn-outline btn-sm">Sign Out</a>
+                    {% else %}
+                        <a href="/accounts/login/" class="btn btn-outline btn-sm">Sign In</a>
+                        <a href="/accounts/register/" class="btn btn-primary btn-sm">Get Started</a>
+                    {% endif %}
+                </div>
+            </header>
+
+            <!-- Page Body -->
+            <div class="page-content">
+                <!-- Flash Messages -->
+                {% if messages %}
+                    <div class="alert-container">
+                        {% for message in messages %}
+                            <div class="alert alert-{{ message.tags|default:'info' }} alert-auto-dismiss">
+                                <span>{{ message }}</span>
+                                <button type="button" class="alert-close-btn">&times;</button>
+                            </div>
+                        {% endfor %}
+                    </div>
+                {% endif %}
+
+                {% block content %}{% endblock %}
+            </div>
+        </main>
+    </div>
+
+    <!-- Master Scripts -->
+    <script src="/static/js/main.js"></script>
+    {% block extra_js %}{% endblock %}
+</body>
+</html>

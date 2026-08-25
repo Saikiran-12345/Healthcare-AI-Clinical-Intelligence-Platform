@@ -1,0 +1,68 @@
+{% extends "base.html" %}
+{% block title %}Notification Detail — HealthAI{% endblock %}
+
+{% block content %}
+<div class="page-header">
+    <div class="page-header-content">
+        <h2>{{ notification.icon }} {{ notification.title }}</h2>
+        <p>{{ notification.label }} — {{ notification.created_at|truncatechars:19 }}</p>
+    </div>
+    <div class="page-header-actions">
+        <a href="/notifications/" class="btn btn-secondary">← Back to Notifications</a>
+    </div>
+</div>
+
+<div class="dashboard-card" style="border-left: 4px solid {{ notification.color }};">
+    <div style="display: flex; align-items: center; gap: 12px; margin-bottom: 16px;">
+        <span style="font-size: 2rem;">{{ notification.icon }}</span>
+        <div>
+            <span class="badge" style="background: {{ notification.color }}; color: white;">{{ notification.label }}</span>
+            {% if notification.priority == 'critical' %}
+                <span class="badge badge-danger">CRITICAL PRIORITY</span>
+            {% elif notification.priority == 'high' %}
+                <span class="badge badge-warning">HIGH PRIORITY</span>
+            {% else %}
+                <span class="badge badge-secondary">{{ notification.priority|upper }} PRIORITY</span>
+            {% endif %}
+        </div>
+    </div>
+
+    <h3 style="margin: 0 0 12px;">{{ notification.title }}</h3>
+    <p style="font-size: 1.05rem; color: #444; line-height: 1.6;">{{ notification.message }}</p>
+
+    <div style="margin-top: 20px; padding-top: 16px; border-top: 1px solid #eee;">
+        <div class="info-grid" style="display: grid; grid-template-columns: repeat(auto-fit, minmax(200px, 1fr)); gap: 12px;">
+            <div>
+                <strong>From:</strong> {{ notification.sender_name }}
+            </div>
+            <div>
+                <strong>Received:</strong> {{ notification.created_at|truncatechars:19 }}
+            </div>
+            <div>
+                <strong>Status:</strong>
+                {% if notification.is_read %}
+                    <span class="badge badge-success">Read</span>
+                {% else %}
+                    <span class="badge badge-primary">Unread</span>
+                {% endif %}
+            </div>
+            {% if notification.read_at %}
+            <div>
+                <strong>Read at:</strong> {{ notification.read_at|truncatechars:19 }}
+            </div>
+            {% endif %}
+        </div>
+    </div>
+
+    {% if notification.link %}
+    <div style="margin-top: 20px;">
+        <a href="{{ notification.link }}" class="btn btn-primary">Go to Related Page →</a>
+    </div>
+    {% endif %}
+
+    <div style="margin-top: 20px; display: flex; gap: 8px;">
+        <a href="/notifications/{{ notification.id }}/archive/" class="btn btn-secondary">Archive</a>
+        <a href="/notifications/{{ notification.id }}/delete/" class="btn btn-danger" onclick="return confirm('Permanently delete this notification?')">Delete</a>
+    </div>
+</div>
+{% endblock %}

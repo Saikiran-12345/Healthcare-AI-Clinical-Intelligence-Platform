@@ -1,0 +1,235 @@
+{% extends 'base.html' %}
+
+{% block title %}Patient Chart - {{ chart.patient.full_name }}{% endblock %}
+{% block page_title %}Patient Clinical Chart & Longitudinal Records{% endblock %}
+
+{% block content %}
+<div class="grid grid-cols-1" style="gap: 1.5rem;">
+    <!-- Patient Profile Banner -->
+    <div class="card" style="background: white; border-left: 4px solid var(--primary);">
+        <div style="display: flex; justify-content: space-between; align-items: flex-start; flex-wrap: wrap; gap: 1rem;">
+            <div>
+                <h2 style="font-size: 1.6rem; font-weight: 800; color: var(--text-main); margin-bottom: 0.25rem;">
+                    {{ chart.patient.full_name }}
+                </h2>
+                <div style="font-size: 0.9rem; color: var(--text-muted);">
+                    DOB: {{ chart.patient.date_of_birth|default:'--' }} &bull; Gender: {{ chart.patient.gender|title }} &bull; Blood Group: {{ chart.patient.blood_group|default:'O+' }} &bull; Phone: {{ chart.patient.phone|default:'--' }}
+                </div>
+            </div>
+            <div>
+                <a href="/doctors/patients/" class="btn btn-outline btn-sm">&larr; Back to Roster</a>
+            </div>
+        </div>
+    </div>
+
+    <!-- Latest Biomarkers Overview -->
+    <div class="grid grid-cols-4">
+        <div class="card stat-card">
+            <div class="stat-icon blue">⚖️</div>
+            <div class="stat-info">
+                <div class="stat-value">{{ chart.latest_profile.bmi|default:'--' }}</div>
+                <div class="stat-label">BMI ({{ chart.latest_profile.bmi_category|default:'--' }})</div>
+            </div>
+        </div>
+
+        <div class="card stat-card">
+            <div class="stat-icon red">❤️</div>
+            <div class="stat-info">
+                <div class="stat-value">
+                    {% if chart.latest_profile %}{{ chart.latest_profile.systolic_bp }}/{{ chart.latest_profile.diastolic_bp }}{% else %}--/--{% endif %}
+                </div>
+                <div class="stat-label">Blood Pressure (mmHg)</div>
+            </div>
+        </div>
+
+        <div class="card stat-card">
+            <div class="stat-icon amber">🩸</div>
+            <div class="stat-info">
+                <div class="stat-value">{{ chart.latest_profile.blood_glucose|default:'--' }}</div>
+                <div class="stat-label">Fasting Glucose (mg/dL)</div>
+            </div>
+        </div>
+
+        <div class="card stat-card">
+            <div class="stat-icon purple">🧪</div>
+            <div class="stat-info">
+                <div class="stat-value">{{ chart.latest_profile.cholesterol|default:'--' }}</div>
+                <div class="stat-label">Cholesterol (mg/dL)</div>
+            </div>
+        </div>
+    </div>
+
+    <!-- ML Predictions and Medical History Grid -->
+    <div class="grid grid-cols-2">
+        <!-- ML Disease Predictions History -->
+        <div class="card">
+            <div class="card-header">
+                <h3 class="card-title">🤖 AI Disease Predictions</h3>
+            </div>
+
+            {% if chart.predictions %}
+                <div class="table-responsive">
+                    <table class="table">
+                        <thead>
+                            <tr>
+                                <th>Disease</th>
+                                <th>Risk Level</th>
+                                <th>Probability</th>
+                                <th>Model Algorithm</th>
+                                <th>Assessed Date</th>
+                            </tr>
+                        </thead>
+                        <tbody>
+                            {% for pred in chart.predictions %}
+                                <tr>
+                                    <td><strong>{{ pred.disease_type|title }}</strong></td>
+                                    <td>
+                                        <span class="badge {% if pred.risk_level == 'HIGH' %}badge-high{% elif pred.risk_level == 'MODERATE' %}badge-moderate{% else %}badge-low{% endif %}">
+                                            {{ pred.risk_level }}
+                                        </span>
+                                    </td>
+                                    <td><strong>{{ pred.probability_pct }}%</strong></td>
+                                    <td>{{ pred.algorithm_used|default:'Ensemble ML' }}</td>
+                                    <td>{{ pred.created_at|slice:":10" }}</td>
+                                </tr>
+                            {% endfor %}
+                        </tbody>
+                    </table>
+                </div>
+            {% else %}
+                <div style="text-align: center; padding: 2rem; color: var(--text-muted);">
+                    No AI predictions recorded for this patient yet.
+                </div>
+            {% endif %}
+        </div>
+
+        <!-- Documented Medical Conditions -->
+        <div class="card">
+            <div class="card-header">
+                <h3 class="card-title">📋 Documented Conditions</h3>
+            </div>
+
+            {% if chart.medical_histories %}
+                <div class="table-responsive">
+                    <table class="table">
+                        <thead>
+                            <tr>
+                                <th>Condition</th>
+                                <th>Status</th>
+                                <th>Severity</th>
+                                <th>Diagnosed</th>
+                            </tr>
+                        </thead>
+                        <tbody>
+                            {% for record in chart.medical_histories %}
+                                <tr>
+                                    <td><strong>{{ record.condition }}</strong></td>
+                                    <td><span class="badge badge-info">{{ record.status }}</span></td>
+                                    <td>{{ record.severity }}</td>
+                                    <td>{{ record.diagnosis_date }}</td>
+                                </tr>
+                            {% endfor %}
+                        </tbody>
+                    </table>
+                </div>
+            {% else %}
+                <div style="text-align: center; padding: 2rem; color: var(--text-muted);">
+                    No chronic conditions registered.
+                </div>
+            {% endif %}
+        </div>
+    </div>
+
+    <!-- Doctor SOAP Clinical Notes Section -->
+    <div class="grid grid-cols-3">
+        <!-- New Clinical Note Form (1 col) -->
+        <div class="card">
+            <div class="card-header">
+                <h3 class="card-title">✍️ Record Clinical SOAP Note</h3>
+            </div>
+
+            <form method="post" action="/doctors/patients/{{ chart.patient.id }}/add-note/">
+                {% csrf_token %}
+
+                <div class="form-group">
+                    <label class="form-label" for="{{ note_form.subjective.id_for_label }}">{{ note_form.subjective.label }}</label>
+                    {{ note_form.subjective }}
+                </div>
+
+                <div class="form-group">
+                    <label class="form-label" for="{{ note_form.assessment.id_for_label }}">{{ note_form.assessment.label }}</label>
+                    {{ note_form.assessment }}
+                </div>
+
+                <div class="form-group">
+                    <label class="form-label" for="{{ note_form.plan.id_for_label }}">{{ note_form.plan.label }}</label>
+                    {{ note_form.plan }}
+                </div>
+
+                <div class="form-group">
+                    <label class="form-label" for="{{ note_form.prescriptions.id_for_label }}">{{ note_form.prescriptions.label }}</label>
+                    {{ note_form.prescriptions }}
+                </div>
+
+                <div class="form-group">
+                    <label class="form-label" for="{{ note_form.follow_up_date.id_for_label }}">{{ note_form.follow_up_date.label }}</label>
+                    {{ note_form.follow_up_date }}
+                </div>
+
+                <button type="submit" class="btn btn-primary btn-block">
+                    Save Note to Chart
+                </button>
+            </form>
+        </div>
+
+        <!-- Clinical Notes Timeline (2 cols) -->
+        <div class="card" style="grid-column: span 2;">
+            <div class="card-header">
+                <h3 class="card-title">📝 Attending Physician Clinical Notes ({{ chart.clinical_notes|length }})</h3>
+            </div>
+
+            {% if chart.clinical_notes %}
+                <div style="display: flex; flex-direction: column; gap: 1.25rem;">
+                    {% for note in chart.clinical_notes %}
+                        <div style="padding: 1.25rem; background: #f8fafc; border: 1px solid var(--border-color); border-radius: var(--radius-md);">
+                            <div style="display: flex; justify-content: space-between; margin-bottom: 0.5rem;">
+                                <strong>👨‍⚕️ {{ note.doctor_name }}</strong>
+                                <span style="font-size: 0.8rem; color: var(--text-muted);">{{ note.created_at|slice:":16" }}</span>
+                            </div>
+
+                            {% if note.subjective %}
+                                <div style="margin-bottom: 0.4rem;">
+                                    <span style="font-weight: 700; font-size: 0.85rem; color: var(--primary);">Subjective:</span>
+                                    <span style="font-size: 0.9rem;">{{ note.subjective }}</span>
+                                </div>
+                            {% endif %}
+
+                            <div style="margin-bottom: 0.4rem;">
+                                <span style="font-weight: 700; font-size: 0.85rem; color: var(--secondary);">Assessment:</span>
+                                <span style="font-size: 0.9rem;">{{ note.assessment }}</span>
+                            </div>
+
+                            {% if note.plan %}
+                                <div style="margin-bottom: 0.4rem;">
+                                    <span style="font-weight: 700; font-size: 0.85rem; color: var(--accent);">Plan:</span>
+                                    <span style="font-size: 0.9rem;">{{ note.plan }}</span>
+                                </div>
+                            {% endif %}
+
+                            {% if note.prescriptions %}
+                                <div style="margin-top: 0.5rem; padding-top: 0.5rem; border-top: 1px dashed var(--border-color); font-size: 0.85rem;">
+                                    <strong>💊 Prescriptions:</strong> {{ note.prescriptions }}
+                                </div>
+                            {% endif %}
+                        </div>
+                    {% endfor %}
+                </div>
+            {% else %}
+                <div style="text-align: center; padding: 3rem; color: var(--text-muted);">
+                    No clinical observation notes recorded yet.
+                </div>
+            {% endif %}
+        </div>
+    </div>
+</div>
+{% endblock %}

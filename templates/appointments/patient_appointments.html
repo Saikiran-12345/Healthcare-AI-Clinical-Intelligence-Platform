@@ -1,0 +1,89 @@
+{% extends 'base.html' %}
+
+{% block title %}My Appointments - HealthAI{% endblock %}
+{% block page_title %}Doctor Consultations & Appointments{% endblock %}
+
+{% block content %}
+<div class="grid grid-cols-1" style="gap: 1.5rem;">
+    <!-- Top Action Bar -->
+    <div class="card" style="display: flex; justify-content: space-between; align-items: center; padding: 1.25rem;">
+        <div>
+            <h3 style="font-size: 1.2rem; font-weight: 700; margin: 0;">Consultation History & Scheduled Visits</h3>
+            <p style="color: var(--text-muted); font-size: 0.85rem; margin: 0;">Track your upcoming medical appointments and doctor responses</p>
+        </div>
+        <a href="/appointments/book/" class="btn btn-primary">
+            + Request Doctor Appointment
+        </a>
+    </div>
+
+    <!-- Appointments Table -->
+    <div class="card">
+        {% if appointments %}
+            <div class="table-responsive">
+                <table class="table">
+                    <thead>
+                        <tr>
+                            <th>Doctor / Specialist</th>
+                            <th>Date & Time</th>
+                            <th>Reason / Chief Complaint</th>
+                            <th>Priority</th>
+                            <th>Status</th>
+                            <th>Doctor Notes / Instructions</th>
+                            <th>Action</th>
+                        </tr>
+                    </thead>
+                    <tbody>
+                        {% for appt in appointments %}
+                            <tr>
+                                <td>
+                                    <strong>{{ appt.doctor_name }}</strong>
+                                    <div style="font-size: 0.78rem; color: var(--text-muted);">{{ appt.doctor_specialization }}</div>
+                                </td>
+                                <td>
+                                    <strong>{{ appt.appointment_date }}</strong>
+                                    <div style="font-size: 0.82rem; color: var(--primary);">{{ appt.appointment_time }}</div>
+                                </td>
+                                <td style="max-width: 200px; font-size: 0.88rem;">{{ appt.reason }}</td>
+                                <td>
+                                    <span class="badge {% if appt.priority == 'Urgent' %}badge-high{% elif appt.priority == 'Follow-up' %}badge-info{% else %}badge-gray{% endif %}">
+                                        {{ appt.priority }}
+                                    </span>
+                                </td>
+                                <td>
+                                    <span class="badge {% if appt.status == 'Approved' %}badge-approved{% elif appt.status == 'Pending' %}badge-pending{% elif appt.status == 'Completed' %}badge-green{% elif appt.status == 'Rejected' %}badge-rejected{% else %}badge-gray{% endif %}">
+                                        {{ appt.status }}
+                                    </span>
+                                </td>
+                                <td style="max-width: 220px; font-size: 0.85rem; color: var(--text-muted);">
+                                    {{ appt.doctor_notes|default:'Awaiting review' }}
+                                </td>
+                                <td>
+                                    {% if appt.status == 'Pending' or appt.status == 'Approved' %}
+                                        <a href="/appointments/cancel/{{ appt.id }}/"
+                                           class="btn btn-outline btn-sm"
+                                           style="color: var(--danger); border-color: #fecaca;"
+                                           onclick="return confirm('Cancel this scheduled appointment?');">
+                                            Cancel
+                                        </a>
+                                    {% else %}
+                                        <span style="font-size: 0.8rem; color: var(--text-muted);">--</span>
+                                    {% endif %}
+                                </td>
+                            </tr>
+                        {% endfor %}
+                    </tbody>
+                </table>
+            </div>
+        {% else %}
+            <div style="text-align: center; padding: 4rem 1rem; color: var(--text-muted);">
+                <div style="font-size: 3rem; margin-bottom: 0.5rem;">📅</div>
+                <h4>No Appointments Scheduled</h4>
+                <p>Request your first clinical consultation with one of our licensed attending physicians.</p>
+                <a href="/appointments/book/" class="btn btn-primary" style="margin-top: 1rem;">
+                    Schedule Appointment Now
+                </a>
+            </div>
+        {% endif %}
+    </div>
+</div>
+{% endblock %}

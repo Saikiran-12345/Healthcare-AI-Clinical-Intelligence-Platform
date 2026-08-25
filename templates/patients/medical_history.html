@@ -1,0 +1,102 @@
+{% extends 'base.html' %}
+
+{% block title %}Medical History - HealthAI{% endblock %}
+{% block page_title %}Chronic Conditions & Medical History{% endblock %}
+
+{% block content %}
+<div class="grid grid-cols-3">
+    <!-- Add Condition Form -->
+    <div class="card">
+        <div class="card-header">
+            <h3 class="card-title">+ Add Medical Condition</h3>
+        </div>
+
+        <form method="post" action="/patients/medical-history/add/">
+            {% csrf_token %}
+
+            <div class="form-group">
+                <label class="form-label" for="{{ form.condition.id_for_label }}">{{ form.condition.label }} *</label>
+                {{ form.condition }}
+            </div>
+
+            <div class="form-group">
+                <label class="form-label" for="{{ form.diagnosis_date.id_for_label }}">{{ form.diagnosis_date.label }} *</label>
+                {{ form.diagnosis_date }}
+            </div>
+
+            <div class="form-group">
+                <label class="form-label" for="{{ form.status.id_for_label }}">{{ form.status.label }}</label>
+                {{ form.status }}
+            </div>
+
+            <div class="form-group">
+                <label class="form-label" for="{{ form.severity.id_for_label }}">{{ form.severity.label }}</label>
+                {{ form.severity }}
+            </div>
+
+            <div class="form-group">
+                <label class="form-label" for="{{ form.notes.id_for_label }}">{{ form.notes.label }}</label>
+                {{ form.notes }}
+            </div>
+
+            <button type="submit" class="btn btn-primary btn-block">
+                Record Condition
+            </button>
+        </form>
+    </div>
+
+    <!-- History Records Table -->
+    <div class="card" style="grid-column: span 2;">
+        <div class="card-header">
+            <h3 class="card-title">Documented Health Conditions ({{ records|length }})</h3>
+        </div>
+
+        {% if records %}
+            <div class="table-responsive">
+                <table class="table">
+                    <thead>
+                        <tr>
+                            <th>Condition</th>
+                            <th>Diagnosed</th>
+                            <th>Status</th>
+                            <th>Severity</th>
+                            <th>Notes</th>
+                            <th>Action</th>
+                        </tr>
+                    </thead>
+                    <tbody>
+                        {% for item in records %}
+                            <tr>
+                                <td><strong>{{ item.condition }}</strong></td>
+                                <td>{{ item.diagnosis_date }}</td>
+                                <td>
+                                    <span class="badge {% if item.status == 'Active' %}badge-high{% elif item.status == 'Managed' %}badge-low{% else %}badge-moderate{% endif %}">
+                                        {{ item.status }}
+                                    </span>
+                                </td>
+                                <td>{{ item.severity }}</td>
+                                <td style="max-width: 200px; font-size: 0.85rem; color: var(--text-muted);">
+                                    {{ item.notes|default:'--' }}
+                                </td>
+                                <td>
+                                    <a href="/patients/medical-history/delete/{{ item.id }}/"
+                                       class="btn btn-danger btn-sm"
+                                       onclick="return confirm('Remove this medical record?');">
+                                        Delete
+                                    </a>
+                                </td>
+                            </tr>
+                        {% endfor %}
+                    </tbody>
+                </table>
+            </div>
+        {% else %}
+            <div style="text-align: center; padding: 3rem; color: var(--text-muted);">
+                <div style="font-size: 3rem; margin-bottom: 0.5rem;">📋</div>
+                <h4>No Medical Conditions Logged</h4>
+                <p>Use the form on the left to add any pre-existing conditions, allergies, or chronic diagnoses.</p>
+            </div>
+        {% endif %}
+    </div>
+</div>
+{% endblock %}

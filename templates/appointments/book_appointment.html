@@ -1,0 +1,86 @@
+{% extends 'base.html' %}
+
+{% block title %}Book Appointment - HealthAI{% endblock %}
+{% block page_title %}Schedule Doctor Consultation{% endblock %}
+
+{% block content %}
+<div style="max-width: 680px; margin: 0 auto;">
+    <div class="card" style="padding: 2.25rem;">
+        <div class="card-header" style="margin-bottom: 1.5rem;">
+            <h3 class="card-title">📅 Request Doctor Consultation</h3>
+        </div>
+
+        <form method="post" action="">
+            {% csrf_token %}
+
+            <div class="form-group">
+                <label class="form-label" for="{{ form.doctor_id.id_for_label }}">{{ form.doctor_id.label }} *</label>
+                {{ form.doctor_id }}
+                {% if form.doctor_id.errors %}<div class="form-error">{{ form.doctor_id.errors.0 }}</div>{% endif %}
+            </div>
+
+            <div class="grid grid-cols-2">
+                <div class="form-group">
+                    <label class="form-label" for="{{ form.appointment_date.id_for_label }}">{{ form.appointment_date.label }} *</label>
+                    {{ form.appointment_date }}
+                    {% if form.appointment_date.errors %}<div class="form-error">{{ form.appointment_date.errors.0 }}</div>{% endif %}
+                </div>
+
+                <div class="form-group">
+                    <label class="form-label" for="{{ form.appointment_time.id_for_label }}">{{ form.appointment_time.label }} *</label>
+                    {{ form.appointment_time }}
+                    {% if form.appointment_time.errors %}<div class="form-error">{{ form.appointment_time.errors.0 }}</div>{% endif %}
+                </div>
+            </div>
+
+            <div class="form-group">
+                <label class="form-label" for="{{ form.priority.id_for_label }}">{{ form.priority.label }}</label>
+                {{ form.priority }}
+            </div>
+
+            <div class="form-group">
+                <label class="form-label" for="{{ form.reason.id_for_label }}">{{ form.reason.label }}</label>
+                {{ form.reason }}
+                {% if form.reason.errors %}<div class="form-error">{{ form.reason.errors.0 }}</div>{% endif %}
+            </div>
+
+            <div style="display: flex; justify-content: space-between; align-items: center; margin-top: 2rem;">
+                <a href="/appointments/my-appointments/" class="btn btn-outline">Cancel</a>
+                <button type="submit" class="btn btn-primary btn-lg">
+                    Confirm & Request Booking
+                </button>
+            </div>
+        </form>
+    </div>
+</div>
+
+<script>
+    // Asynchronously fetch available doctor slots on date change
+    const docSelect = document.getElementById('select_doctor');
+    const dateInput = document.getElementById('input_appt_date');
+    const timeSelect = document.getElementById('select_time_slot');
+
+    async function refreshSlots() {
+        if (docSelect && dateInput && timeSelect && docSelect.value && dateInput.value) {
+            try {
+                const res = await fetch(`/appointments/api/slots/?doctor_id=${docSelect.value}&date=${dateInput.value}`);
+                const data = await res.json();
+                if (data.slots && data.slots.length > 0) {
+                    timeSelect.innerHTML = '';
+                    data.slots.forEach(slot => {
+                        const opt = document.createElement('option');
+                        opt.value = slot;
+                        opt.textContent = slot;
+                        timeSelect.appendChild(opt);
+                    });
+                }
+            } catch (e) {
+                console.error("Failed to load available slots", e);
+            }
+        }
+    }
+
+    docSelect?.addEventListener('change', refreshSlots);
+    dateInput?.addEventListener('change', refreshSlots);
+</script>
+{% endblock %}

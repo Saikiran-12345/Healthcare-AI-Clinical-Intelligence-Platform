@@ -1,0 +1,107 @@
+{% extends 'base.html' %}
+
+{% block title %}Account Profile - Healthcare AI Platform{% endblock %}
+{% block page_title %}User Account & Clinical Profile{% endblock %}
+
+{% block content %}
+<div class="grid grid-cols-3">
+    <!-- Profile Summary Card -->
+    <div class="card" style="text-align: center;">
+        <div class="user-avatar" style="width: 80px; height: 80px; font-size: 2rem; margin: 0 auto 1rem; background: #e0f2fe; color: #0284c7;">
+            {{ user.first_name|default:user.username|slice:":1"|upper }}
+        </div>
+        <h3 style="font-size: 1.25rem; font-weight: 700;">{{ user.full_name|default:user.username }}</h3>
+        <p style="color: var(--text-muted); font-size: 0.85rem; margin-bottom: 0.75rem;">@{{ user.username }}</p>
+        <div>
+            <span class="badge {% if user.role == 'patient' %}badge-green{% elif user.role == 'doctor' %}badge-blue{% else %}badge-amber{% endif %}">
+                {{ user.role|upper }}
+            </span>
+        </div>
+
+        <div style="margin-top: 1.5rem; text-align: left; border-top: 1px solid var(--border-color); padding-top: 1rem; font-size: 0.875rem;">
+            <div style="margin-bottom: 0.5rem;"><strong>Email:</strong> {{ user.email }}</div>
+            <div style="margin-bottom: 0.5rem;"><strong>Phone:</strong> {{ user.phone|default:'Not set' }}</div>
+            <div style="margin-bottom: 0.5rem;"><strong>Member Since:</strong> {{ user.created_at|slice:":10" }}</div>
+            <div style="margin-bottom: 0.5rem;"><strong>Last Sign In:</strong> {{ user.last_login|slice:":10"|default:'Current Session' }}</div>
+        </div>
+
+        <div style="margin-top: 1.5rem;">
+            <a href="/accounts/change-password/" class="btn btn-outline btn-block btn-sm">
+                🔑 Change Password
+            </a>
+        </div>
+    </div>
+
+    <!-- Edit Profile Information -->
+    <div class="card" style="grid-column: span 2;">
+        <div class="card-header">
+            <h3 class="card-title">Edit Personal Details</h3>
+        </div>
+
+        <form method="post" action="">
+            {% csrf_token %}
+
+            <div class="grid grid-cols-2">
+                <div class="form-group">
+                    <label class="form-label" for="{{ form.first_name.id_for_label }}">{{ form.first_name.label }}</label>
+                    {{ form.first_name }}
+                    {% if form.first_name.errors %}
+                        <div class="form-error">{{ form.first_name.errors.0 }}</div>
+                    {% endif %}
+                </div>
+
+                <div class="form-group">
+                    <label class="form-label" for="{{ form.last_name.id_for_label }}">{{ form.last_name.label }}</label>
+                    {{ form.last_name }}
+                    {% if form.last_name.errors %}
+                        <div class="form-error">{{ form.last_name.errors.0 }}</div>
+                    {% endif %}
+                </div>
+            </div>
+
+            <div class="grid grid-cols-2">
+                <div class="form-group">
+                    <label class="form-label" for="{{ form.phone.id_for_label }}">{{ form.phone.label }}</label>
+                    {{ form.phone }}
+                    {% if form.phone.errors %}
+                        <div class="form-error">{{ form.phone.errors.0 }}</div>
+                    {% endif %}
+                </div>
+
+                <div class="form-group">
+                    <label class="form-label" for="{{ form.date_of_birth.id_for_label }}">{{ form.date_of_birth.label }}</label>
+                    {{ form.date_of_birth }}
+                    {% if form.date_of_birth.errors %}
+                        <div class="form-error">{{ form.date_of_birth.errors.0 }}</div>
+                    {% endif %}
+                </div>
+            </div>
+
+            {% if user.role == 'patient' %}
+                <div class="grid grid-cols-2">
+                    <div class="form-group">
+                        <label class="form-label" for="{{ form.gender.id_for_label }}">{{ form.gender.label }}</label>
+                        {{ form.gender }}
+                    </div>
+
+                    <div class="form-group">
+                        <label class="form-label" for="{{ form.blood_group.id_for_label }}">{{ form.blood_group.label }}</label>
+                        {{ form.blood_group }}
+                    </div>
+                </div>
+
+                <div class="form-group">
+                    <label class="form-label" for="{{ form.emergency_contact.id_for_label }}">{{ form.emergency_contact.label }}</label>
+                    {{ form.emergency_contact }}
+                </div>
+            {% endif %}
+
+            <div style="margin-top: 1.5rem; display: flex; justify-content: flex-end; gap: 0.75rem;">
+                <button type="submit" class="btn btn-primary">
+                    Save Profile Changes
+                </button>
+            </div>
+        </form>
+    </div>
+</div>
+{% endblock %}

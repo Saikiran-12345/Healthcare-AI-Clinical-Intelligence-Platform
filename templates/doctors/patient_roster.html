@@ -1,0 +1,103 @@
+{% extends 'base.html' %}
+
+{% block title %}Patient Roster - Clinical Directory{% endblock %}
+{% block page_title %}Patient Clinical Directory & Roster{% endblock %}
+
+{% block content %}
+<div class="grid grid-cols-1" style="gap: 1.5rem;">
+    <!-- Search & Filters Bar -->
+    <div class="card" style="padding: 1.25rem;">
+        <form method="get" action="" style="display: flex; gap: 1rem; align-items: flex-end; flex-wrap: wrap;">
+            <div style="flex: 2; min-width: 250px;">
+                <label class="form-label" for="{{ search_form.q.id_for_label }}">Search Patients</label>
+                {{ search_form.q }}
+            </div>
+
+            <div style="flex: 1; min-width: 180px;">
+                <label class="form-label" for="{{ search_form.risk_level.id_for_label }}">Filter by Risk Tier</label>
+                {{ search_form.risk_level }}
+            </div>
+
+            <div>
+                <button type="submit" class="btn btn-primary">
+                    🔍 Filter Roster
+                </button>
+                <a href="/doctors/patients/" class="btn btn-outline">Reset</a>
+            </div>
+        </form>
+    </div>
+
+    <!-- Patients Roster Table -->
+    <div class="card">
+        <div class="card-header">
+            <h3 class="card-title">Registered Patients ({{ total_count }})</h3>
+        </div>
+
+        {% if roster %}
+            <div class="table-responsive">
+                <table class="table">
+                    <thead>
+                        <tr>
+                            <th>Patient Name</th>
+                            <th>Contact / Email</th>
+                            <th>Age & Gender</th>
+                            <th>Latest BMI</th>
+                            <th>Blood Pressure</th>
+                            <th>Highest AI Risk</th>
+                            <th>Clinical Actions</th>
+                        </tr>
+                    </thead>
+                    <tbody>
+                        {% for row in roster %}
+                            <tr>
+                                <td>
+                                    <strong>{{ row.patient.full_name }}</strong>
+                                    <div style="font-size: 0.78rem; color: var(--text-muted);">@{{ row.patient.username }}</div>
+                                </td>
+                                <td>
+                                    <div>{{ row.patient.email }}</div>
+                                    <div style="font-size: 0.8rem; color: var(--text-muted);">{{ row.patient.phone|default:'--' }}</div>
+                                </td>
+                                <td>
+                                    {{ row.latest_profile.age|default:'--' }} yrs &bull; {{ row.patient.gender|title }}
+                                </td>
+                                <td>
+                                    {% if row.latest_profile %}
+                                        <strong>{{ row.latest_profile.bmi }}</strong>
+                                        <div style="font-size: 0.78rem; color: var(--text-muted);">{{ row.latest_profile.bmi_category }}</div>
+                                    {% else %}
+                                        <span style="color: var(--text-muted);">Not Assessed</span>
+                                    {% endif %}
+                                </td>
+                                <td>
+                                    {% if row.latest_profile %}
+                                        {{ row.latest_profile.systolic_bp }}/{{ row.latest_profile.diastolic_bp }} mmHg
+                                    {% else %}
+                                        --
+                                    {% endif %}
+                                </td>
+                                <td>
+                                    <span class="badge {% if row.highest_risk == 'HIGH' %}badge-high{% elif row.highest_risk == 'MODERATE' %}badge-moderate{% else %}badge-low{% endif %}">
+                                        {{ row.highest_risk }}
+                                    </span>
+                                </td>
+                                <td>
+                                    <a href="/doctors/patients/{{ row.patient.id }}/" class="btn btn-primary btn-sm">
+                                        📋 View Chart
+                                    </a>
+                                </td>
+                            </tr>
+                        {% endfor %}
+                    </tbody>
+                </table>
+            </div>
+        {% else %}
+            <div style="text-align: center; padding: 3rem; color: var(--text-muted);">
+                <div style="font-size: 3rem; margin-bottom: 0.5rem;">👥</div>
+                <h4>No Patients Match Search Query</h4>
+                <p>Try searching for a different name, email, or resetting filters.</p>
+            </div>
+        {% endif %}
+    </div>
+</div>
+{% endblock %}

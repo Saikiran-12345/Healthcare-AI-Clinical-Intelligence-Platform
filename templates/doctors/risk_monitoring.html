@@ -1,0 +1,97 @@
+{% extends 'base.html' %}
+
+{% block title %}High-Risk Surveillance Board - HealthAI{% endblock %}
+{% block page_title %}High-Risk Patient Triage & Active Surveillance{% endblock %}
+
+{% block content %}
+<div class="grid grid-cols-1" style="gap: 1.5rem;">
+    <!-- Alert Banner -->
+    <div class="card" style="background: #fef2f2; border: 1px solid #fecaca;">
+        <div style="display: flex; gap: 1rem; align-items: center;">
+            <div style="font-size: 2rem;">⚠️</div>
+            <div>
+                <h3 style="font-size: 1.1rem; font-weight: 800; color: #991b1b; margin-bottom: 0.25rem;">
+                    Clinical Risk Alert Board ({{ count }} Flagged Patients)
+                </h3>
+                <p style="font-size: 0.9rem; color: #7f1d1d; margin: 0;">
+                    Patients listed below have machine learning predictions exceeding the HIGH risk threshold (&gt; 70% probability). Please review clinical charts and initiate follow-up.
+                </p>
+            </div>
+        </div>
+    </div>
+
+    <!-- High Risk Patients Table -->
+    <div class="card">
+        <div class="card-header">
+            <h3 class="card-title">Priority Patients Requiring Clinical Attention</h3>
+            <a href="/doctors/patients/" class="btn btn-outline btn-sm">All Patients</a>
+        </div>
+
+        {% if high_risk_patients %}
+            <div class="table-responsive">
+                <table class="table">
+                    <thead>
+                        <tr>
+                            <th>Patient</th>
+                            <th>High-Risk Indicators</th>
+                            <th>Prediction Confidence</th>
+                            <th>Blood Pressure</th>
+                            <th>Glucose / Labs</th>
+                            <th>Action</th>
+                        </tr>
+                    </thead>
+                    <tbody>
+                        {% for item in high_risk_patients %}
+                            <tr>
+                                <td>
+                                    <strong>{{ item.patient.full_name }}</strong>
+                                    <div style="font-size: 0.78rem; color: var(--text-muted);">
+                                        {{ item.patient.email }} &bull; {{ item.patient.gender|title }}
+                                    </div>
+                                </td>
+                                <td>
+                                    <div style="display: flex; gap: 0.35rem; flex-wrap: wrap;">
+                                        {% for d in item.all_high_diseases %}
+                                            <span class="badge badge-high">{{ d|title }}</span>
+                                        {% endfor %}
+                                    </div>
+                                </td>
+                                <td>
+                                    <strong style="color: var(--danger); font-size: 1.1rem;">
+                                        {{ item.flagged_prediction.probability_pct }}%
+                                    </strong>
+                                </td>
+                                <td>
+                                    {% if item.latest_profile %}
+                                        <strong>{{ item.latest_profile.systolic_bp }}/{{ item.latest_profile.diastolic_bp }}</strong> mmHg
+                                    {% else %}
+                                        --
+                                    {% endif %}
+                                </td>
+                                <td>
+                                    {% if item.latest_profile %}
+                                        {{ item.latest_profile.blood_glucose }} mg/dL glucose
+                                    {% else %}
+                                        --
+                                    {% endif %}
+                                </td>
+                                <td>
+                                    <a href="/doctors/patients/{{ item.patient.id }}/" class="btn btn-danger btn-sm">
+                                        🩺 Open Triage Chart
+                                    </a>
+                                </td>
+                            </tr>
+                        {% endfor %}
+                    </tbody>
+                </table>
+            </div>
+        {% else %}
+            <div style="text-align: center; padding: 4rem 1rem; color: var(--text-muted);">
+                <div style="font-size: 3.5rem; margin-bottom: 0.5rem;">🎉</div>
+                <h3>Zero High-Risk Alerts Active</h3>
+                <p>All currently registered patients fall within low or moderate risk parameters.</p>
+            </div>
+        {% endif %}
+    </div>
+</div>
+{% endblock %}

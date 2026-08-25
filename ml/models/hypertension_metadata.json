@@ -1,0 +1,235 @@
+{
+  "disease_type": "hypertension",
+  "disease_key": "hypertension",
+  "best_algorithm": "Logistic Regression",
+  "features_used": [
+    "age",
+    "bmi",
+    "systolic_bp",
+    "diastolic_bp",
+    "physical_activity",
+    "sodium_diet",
+    "smoking",
+    "alcohol",
+    "family_history"
+  ],
+  "feature_importance": {
+    "age": 0.49,
+    "bmi": 0.3363,
+    "systolic_bp": 1.2153,
+    "diastolic_bp": 0.551,
+    "physical_activity": 0.2762,
+    "sodium_diet": 0.3733,
+    "smoking": 0.1791,
+    "alcohol": 0.187,
+    "family_history": 0.3097
+  },
+  "metrics": {
+    "accuracy": 0.7792,
+    "accuracy_pct": 77.92,
+    "precision": 0.7937,
+    "recall": 0.7874,
+    "f1_score": 0.7905,
+    "roc_auc": 0.8487,
+    "confusion_matrix": [
+      [
+        87,
+        26
+      ],
+      [
+        27,
+        100
+      ]
+    ],
+    "true_negatives": 87,
+    "false_positives": 26,
+    "false_negatives": 27,
+    "true_positives": 100,
+    "cross_validation": {
+      "cv_folds": 5,
+      "mean_accuracy": 0.7844,
+      "std_accuracy": 0.0205,
+      "fold_scores": [
+        0.8073,
+        0.7552,
+        0.7917,
+        0.7656,
+        0.8021
+      ]
+    }
+  },
+  "all_model_comparisons": {
+    "Logistic Regression": {
+      "accuracy": 0.7792,
+      "accuracy_pct": 77.92,
+      "precision": 0.7937,
+      "recall": 0.7874,
+      "f1_score": 0.7905,
+      "roc_auc": 0.8487,
+      "confusion_matrix": [
+        [
+          87,
+          26
+        ],
+        [
+          27,
+          100
+        ]
+      ],
+      "true_negatives": 87,
+      "false_positives": 26,
+      "false_negatives": 27,
+      "true_positives": 100,
+      "cross_validation": {
+        "cv_folds": 5,
+        "mean_accuracy": 0.7844,
+        "std_accuracy": 0.0205,
+        "fold_scores": [
+          0.8073,
+          0.7552,
+          0.7917,
+          0.7656,
+          0.8021
+        ]
+      }
+    },
+    "Decision Tree": {
+      "accuracy": 0.7292,
+      "accuracy_pct": 72.92,
+      "precision": 0.7313,
+      "recall": 0.7717,
+      "f1_score": 0.751,
+      "roc_auc": 0.7523,
+      "confusion_matrix": [
+        [
+          77,
+          36
+        ],
+        [
+          29,
+          98
+        ]
+      ],
+      "true_negatives": 77,
+      "false_positives": 36,
+      "false_negatives": 29,
+      "true_positives": 98,
+      "cross_validation": {
+        "cv_folds": 5,
+        "mean_accuracy": 0.7042,
+        "std_accuracy": 0.0141,
+        "fold_scores": [
+          0.7188,
+          0.7083,
+          0.7083,
+          0.6771,
+          0.7083
+        ]
+      }
+    },
+    "Random Forest": {
+      "accuracy": 0.775,
+      "accuracy_pct": 77.5,
+      "precision": 0.7874,
+      "recall": 0.7874,
+      "f1_score": 0.7874,
+      "roc_auc": 0.8403,
+      "confusion_matrix": [
+        [
+          86,
+          27
+        ],
+        [
+          27,
+          100
+        ]
+      ],
+      "true_negatives": 86,
+      "false_positives": 27,
+      "false_negatives": 27,
+      "true_positives": 100,
+      "cross_validation": {
+        "cv_folds": 5,
+        "mean_accuracy": 0.7573,
+        "std_accuracy": 0.021,
+        "fold_scores": [
+          0.7708,
+          0.7344,
+          0.776,
+          0.7292,
+          0.776
+        ]
+      }
+    },
+    "Gradient Boosting": {
+      "accuracy": 0.7667,
+      "accuracy_pct": 76.67,
+      "precision": 0.7669,
+      "recall": 0.8031,
+      "f1_score": 0.7846,
+      "roc_auc": 0.811,
+      "confusion_matrix": [
+        [
+          82,
+          31
+        ],
+        [
+          25,
+          102
+        ]
+      ],
+      "true_negatives": 82,
+      "false_positives": 31,
+      "false_negatives": 25,
+      "true_positives": 102,
+      "cross_validation": {
+        "cv_folds": 5,
+        "mean_accuracy": 0.7312,
+        "std_accuracy": 0.0163,
+        "fold_scores": [
+          0.75,
+          0.7031,
+          0.7448,
+          0.7292,
+          0.7292
+        ]
+      }
+    },
+    "KNN": {
+      "accuracy": 0.75,
+      "accuracy_pct": 75.0,
+      "precision": 0.7557,
+      "recall": 0.7795,
+      "f1_score": 0.7674,
+      "roc_auc": 0.7826,
+      "confusion_matrix": [
+        [
+          81,
+          32
+        ],
+        [
+          28,
+          99
+        ]
+      ],
+      "true_negatives": 81,
+      "false_positives": 32,
+      "false_negatives": 28,
+      "true_positives": 99,
+      "cross_validation": {
+        "cv_folds": 5,
+        "mean_accuracy": 0.7156,
+        "std_accuracy": 0.022,
+        "fold_scores": [
+          0.7396,
+          0.6823,
+          0.7344,
+          0.6979,
+          0.724
+        ]
+      }
+    }
+  },
+  "model_path": "ml\\models\\hypertension_model.joblib",
+  "scaler_path": "ml\\models\\hypertension_scaler.joblib"
+}

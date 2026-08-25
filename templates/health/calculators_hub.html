@@ -1,0 +1,86 @@
+{% extends 'base.html' %}
+
+{% block title %}Health Calculators Hub - HealthAI{% endblock %}
+{% block page_title %}Clinical & Physiological Health Calculators{% endblock %}
+
+{% block content %}
+<div class="grid grid-cols-1" style="gap: 2rem;">
+    <!-- Introduction Banner -->
+    <div class="card" style="background: linear-gradient(135deg, #0284c7 0%, #0369a1 100%); color: white;">
+        <h2 style="font-size: 1.6rem; font-weight: 800; margin-bottom: 0.5rem;">
+            Evidence-Based Physiological Calculators
+        </h2>
+        <p style="opacity: 0.9; font-size: 0.95rem; max-width: 800px; line-height: 1.6;">
+            Accurate, locally executed medical calculations derived from World Health Organization (WHO), American Heart Association (AHA), and standard clinical physiology equations.
+        </p>
+    </div>
+
+    <!-- Calculators Grid -->
+    <div class="grid grid-cols-3">
+        <!-- BMI Calculator Card -->
+        <div class="card">
+            <div class="card-header">
+                <h3 class="card-title">⚖️ Body Mass Index (BMI)</h3>
+            </div>
+            <p style="color: var(--text-muted); font-size: 0.9rem; margin-bottom: 1.5rem;">
+                Calculate your BMI, WHO weight classification category, and ideal target weight bounds for your height.
+            </p>
+            <a href="/health/calculators/bmi/" class="btn btn-primary btn-block">
+                Open BMI Calculator &rarr;
+            </a>
+        </div>
+
+        <!-- BMR & TDEE Card -->
+        <div class="card">
+            <div class="card-header">
+                <h3 class="card-title">🔥 BMR & TDEE Calories</h3>
+            </div>
+            <p style="color: var(--text-muted); font-size: 0.9rem; margin-bottom: 1.5rem;">
+                Estimate Basal Metabolic Rate using Mifflin-St Jeor equation and Total Daily Energy Expenditure with macronutrient splits.
+            </p>
+            <a href="/health/calculators/bmr/" class="btn btn-primary btn-block">
+                Open BMR & TDEE Tool &rarr;
+            </a>
+        </div>
+
+        <!-- Blood Pressure Analyzer Card -->
+        <div class="card">
+            <div class="card-header">
+                <h3 class="card-title">❤️ Blood Pressure & MAP</h3>
+            </div>
+            <p style="color: var(--text-muted); font-size: 0.9rem; margin-bottom: 1.5rem;">
+                AHA/ACC 2017 staging criteria, Mean Arterial Pressure (MAP), and Pulse Pressure evaluation.
+            </p>
+            <a href="/health/calculators/bp/" class="btn btn-primary btn-block">
+                Analyze Blood Pressure &rarr;
+            </a>
+        </div>
+
+        <!-- Heart Rate Zones Card -->
+        <div class="card">
+            <div class="card-header">
+                <h3 class="card-title">💓 Heart Rate & Training Zones</h3>
+            </div>
+            <p style="color: var(--text-muted); font-size: 0.9rem; margin-bottom: 1.5rem;">
+                Assess resting heart rate (bradycardia/tachycardia) and calculate aerobic, fat burn, and anaerobic exercise heart rate bands.
+            </p>
+            <a href="/health/calculators/heart-rate/" class="btn btn-primary btn-block">
+                Calculate HR Zones &rarr;
+            </a>
+        </div>
+
+        <!-- Composite Health Score Card -->
+        <div class="card" style="grid-column: span 2;">
+            <div class="card-header">
+                <h3 class="card-title">🌟 Multi-Dimensional Health Score (0-100)</h3>
+            </div>
+            <p style="color: var(--text-muted); font-size: 0.9rem; margin-bottom: 1.5rem;">
+                Comprehensive algorithmic synthesis evaluating cardiovascular health, glycemic metabolism, biometric status, hydration, sleep, and lifestyle habits into a unified health rating.
+            </p>
+            <a href="/health/calculators/health-score/" class="btn btn-secondary btn-block">
+                Launch Full Health Score Analyzer &rarr;
+            </a>
+        </div>
+    </div>
+</div>
+{% endblock %}
